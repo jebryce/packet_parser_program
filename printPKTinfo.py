@@ -5,7 +5,7 @@ def printPKTinfo(pkt_dict):
     bar_length = 125
     # Print MAC address info
     pkt_table = "  {type:>11} | {dataType:^17} | {description}"
-    etherType_table = "  {type:>11} | {dataType:^4} | {value:^10} | {description}"
+    etherType_table = "  {type:>11} | {dataName:^9} | {dataValue:^6} | {description}"
     print(bar_length*'%')
     print(pkt_table.format(type = '', dataType = 'MAC Address', description='Vendor ID'))
     print(14*'-'+'+'+19*'-'+'+'+(bar_length-35)*'-')
@@ -21,9 +21,10 @@ def printPKTinfo(pkt_dict):
 
     # Print EtherType info
     print(bar_length*'%')
-    print(etherType_table.format(type = 'EtherType', dataType = 'Hex', value='VLAN ID',description = 'Description'))
-    print(14*'-'+'+'+6*'-'+'+'+12*'-'+'+'+(bar_length-35)*'-')
-    print(etherType_table.format(type = '802.1Q', dataType = pkt_dict['VLAN EtherType'].hex().upper(), value = pkt_dict['VLAN ID'].hex().upper(), description = ''))
+    print(etherType_table.format(type = '', dataName = 'Name', dataValue='Value', description = 'Description'))
+    print(14*'-'+'+'+11*'-'+'+'+8*'-'+'+'+(bar_length-35)*'-')
+    for etherType in pkt_dict['EtherTypes']:
+        print(etherType_table.format(type = pkt_dict['EtherTypes'][etherType][0], dataName = etherType, dataValue = pkt_dict['EtherTypes'][etherType][1].hex(), description = ''))
 
 
 

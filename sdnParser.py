@@ -22,22 +22,21 @@ pkt_dict.update({'Source MAC Adress':pkt[i:i+6]})
 pkt_dict.update({'Destination MAC Adress':pkt[i+6:i+12]})
 i += 12
 
+pkt_dict.update({'EtherTypes':{}})
 #Check if tagged traffic
 if pkt[i:i+2].hex()=='8100':
-    pkt_dict.update({'VLAN EtherType':pkt[i:i+2]})
-    pkt_dict.update({'VLAN ID':pkt[i+2:i+4]})
+    pkt_dict['EtherTypes'].update({'802.1Q':['EtherType',pkt[i:i+2]],'':['VLAN ID', pkt[i+2:i+4]]})
     i += 4
 
 #Check if ARP packet
 if pkt[i:i+2].hex()=='0806':
-    pkt_dict.update({'ARP EtherType':pkt[i:i+2]})
-    pkt_dict.update({'??':pkt[i+2:i+4]})
+    pkt_dict['EtherTypes'].update({'ARP':['EtherType',pkt[i:i+2]],'??':['??', pkt[i+2:i+4]]})
+
     i += 4
 
 #Check if IPv4 packet
 if pkt[i:i+2].hex()=='0800':
-    pkt_dict.update({'IPv4 EtherType':pkt[i:i+2]})
-    pkt_dict.update({'??':pkt[i+2:i+4]})
+    pkt_dict['EtherTypes'].update({'IPv4':['EtherType',pkt[i:i+2]],'???':['??',pkt[i+2:i+4]]})
     i += 4
 
 
