@@ -1,15 +1,3 @@
-import pktSTR2BYT, printPKTinfo
-
-
-
-'''
-data = open('data.txt','r').read().replace('-','').replace('\n\n','\n')
-data2 = open('data2.txt','w')
-data2.write(data)
-'''
-
-
-
 class Packet:
     def __init__(self, packet):
         self.packet = packet
@@ -34,9 +22,6 @@ class Packet:
 
         if self.ethertype.hex() == '0806':
             self.arp = arp(self.packet[14+self.i:])
-        
-
-
 
 class arp(Packet):
     def __init__(self, arp_packet):
@@ -57,16 +42,3 @@ class arp(Packet):
 
         self.target_mac_address = self.arp_packet[18:24]
         self.target_ip_address = self.arp_packet[24:28]
-
-
-
-
-pkt_str_list = open('data2.txt','r').readlines()
-ct = 0
-for pkt_str in pkt_str_list:
-    ct += 1
-    pkt = pktSTR2BYT.pktSTR2BYT(pkt_str) 
-    
-    pkt_object = Packet(pkt)
-
-    printPKTinfo.printPKTinfo(pkt_object)
