@@ -3,7 +3,7 @@ import os
 def createPrintList(pkt_object):
     
     # bar_length is the number of characters wide to print the table row borders
-    bar_length = 125
+    bar_length = 76
     
     # This function populates a list full of strings
     printList = []
@@ -78,11 +78,12 @@ def createPrintList(pkt_object):
 def printPKTinfo(pkt_object):
     printList = createPrintList(pkt_object)
 
-    os.system('cls')
+    #os.system('cls')
     
     for line in printList:
         print(line)
 
     hexdump.hexdump(pkt_object.packet)
+    print('\n'*5)
 
 

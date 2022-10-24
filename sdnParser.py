@@ -8,10 +8,7 @@ data2 = open('data2.txt','w')
 data2.write(data)
 '''
 
-pkt_str = open('data2.txt','r').readlines()
-pkt_str = pkt_str[1]
 
-pkt = pktSTR2BYT.pktSTR2BYT(pkt_str)
 
 class Packet:
     def __init__(self, packet):
@@ -63,12 +60,13 @@ class arp(Packet):
 
 
 
-        
 
-        
+pkt_str_list = open('data2.txt','r').readlines()
+ct = 0
+for pkt_str in pkt_str_list:
+    ct += 1
+    pkt = pktSTR2BYT.pktSTR2BYT(pkt_str) 
+    
+    pkt_object = Packet(pkt)
 
-
-pkt_object = Packet(pkt)
-
-print('\n'*50)
-printPKTinfo.printPKTinfo(pkt_object)
+    printPKTinfo.printPKTinfo(pkt_object)
