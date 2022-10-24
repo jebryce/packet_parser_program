@@ -63,15 +63,15 @@ def createPrintList(pkt_object):
         printList.append(pkt_table_line)
 
         # IP address
-        printList.append(pkt_table.format(type = '', dataType = 'IP Address', description='Vendor ID'))
+        printList.append(pkt_table.format(type = '', dataType = 'IP Address', description='Location'))
         printList.append(pkt_table_line)
         printList.append(pkt_table.format(type = 'ARP Sender', dataType = bytes2ip.format(*pkt_object.arp.sender_ip_address), description = ''))
         printList.append(pkt_table.format(type = 'ARP Target', dataType = bytes2ip.format(*pkt_object.arp.target_ip_address), description = ''))
 
-
     
-            
-    printList.append('\n'*2)
+        printList.append(bar)  
+
+
     return printList
     
 
