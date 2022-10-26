@@ -22,6 +22,8 @@ class Packet:
 
         if self.ethertype.hex() == '0806':
             self.arp = arp(self.packet[14+self.i:])
+        elif self.ethertype.hex() == '0800'
+            self.ipv4 = ipv4(self.packet[14+self.i:])
 
 class arp(Packet):
     def __init__(self, arp_packet):
@@ -42,3 +44,6 @@ class arp(Packet):
 
         self.target_mac_address = self.arp_packet[18:24]
         self.target_ip_address = self.arp_packet[24:28]
+
+class ipv4(Packet):
+    pass
