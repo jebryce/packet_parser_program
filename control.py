@@ -18,12 +18,15 @@ editted_listdata.write(listdata)
 # strings like:     "255 89 163 0 199"
 #
 # Then it calls function listString2bytes, which converts the string 
-# "255 89 163 0 199" to its bytes equivalent of FF 59 A3 00 77
+# "255 89 163 0 199 99 168 242" to a bytes object containing:
+# FF 59 A3 00 C7 63 A8 F2
 #
 # After this, the sdnParser and printPKTinfo libraries will be used just as 
 # they would be in lab, taking in bytes objects
 #
 # please see each imported file for more information
+#
+# This is used for testing only
 #
 import listString2bytes, sdnParser, printPKTinfo
 
@@ -33,7 +36,7 @@ pkt_list = open('editted_listdata.txt','r').readlines()
 
 # for each line in the text file
 for byte_string in pkt_list:
-
+    
     # convert the line into it's intended bytes object
     pkt = listString2bytes.listString2bytes(byte_string)
     
@@ -42,5 +45,5 @@ for byte_string in pkt_list:
 
     # print the objects information to console
     printPKTinfo.printPKTinfo(pkt_object)
-    
+
     break
