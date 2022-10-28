@@ -1,20 +1,46 @@
-import pktSTR2BYT, sdnParser, printPKTinfo
+#   In order to write this parser at home, I needed bytes objects (in the 
+# formatting as seen in lab). The easiest way I found to do this was to save 
+# the bytes object to a text file. There are 100% better ways to do this, but 
+# this was for testing only and is not meant for production use.
+# 
+#   In Lab, I first saved the output of 'print(list(bytes))' to a file, for 
+# example: 'listdata.txt'. Then at home, I converted this initial text file to 
+# a more usable one using the following code:
+"""
+listdata = open('listdata.txt','r').read()
+listdata.replace(',','').replace('[','').replace(']','')
+editted_listdata = open('editted_listdata.txt','w')
+editted_listdata.write(listdata)
+"""
+# This reads the original file, which for example, has multiple (long) lines of 
+# strings like:     "[255, 89, 163, 0, 119]"
+# then creates a new file, which for example, has multiple (long) lines of 
+# strings like:     "255 89 163 0 199"
+#
+# Then it calls function listString2bytes, which converts the string 
+# "255 89 163 0 199" to its bytes equivalent of FF 59 A3 00 77
+#
+# After this, the sdnParser and printPKTinfo libraries will be used just as 
+# they would be in lab, taking in bytes objects
+#
+# please see each imported file for more information
+#
+import listString2bytes, sdnParser, printPKTinfo
 
 
-
-'''
-data = open('data.txt','r').read().replace('-','').replace('\n\n','\n')
-data2 = open('data2.txt','w')
-data2.write(data)
-'''
+pkt_list = open('editted_listdata.txt','r').readlines()
 
 
-pkt_str_list = open('data2.txt','r').readlines()
-ct = 0
-for pkt_str in pkt_str_list:
-    ct += 1
-    pkt = pktSTR2BYT.pktSTR2BYT(pkt_str) 
+# for each line in the text file
+for byte_string in pkt_list:
+
+    # convert the line into it's intended bytes object
+    pkt = listString2bytes.listString2bytes(byte_string)
     
+    # create an object with the packet's information parsed
     pkt_object = sdnParser.Packet(pkt)
 
+    # print the objects information to console
     printPKTinfo.printPKTinfo(pkt_object)
+    
+    break
