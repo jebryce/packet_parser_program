@@ -22,7 +22,7 @@ class Packet:
 
         if self.ethertype.hex() == '0806':
             self.arp = arp(self.packet[14+self.i:])
-        elif self.ethertype.hex() == '0800'
+        elif self.ethertype.hex() == '0800':
             self.ipv4 = ipv4(self.packet[14+self.i:])
 
 class arp(Packet):
