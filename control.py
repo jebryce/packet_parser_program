@@ -28,7 +28,9 @@ editted_listdata.write(listdata)
 #
 # This is used for testing only
 #
-import listString2bytes, sdnParser, printPKTinfo
+import functions.listString2bytes as listString2bytes
+import functions.sdnParser as sdnParser
+import functions.printPKTinfo as printPKTinfo
 
 
 pkt_list = open('editted_listdata.txt','r').readlines()

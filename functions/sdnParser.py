@@ -1,4 +1,4 @@
-import EtherType_dict
+import library.EtherType_dict as EtherType_dict
 
 class Packet:
     def __init__(self, packet):
