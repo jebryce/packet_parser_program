@@ -3,7 +3,7 @@ import os
 def createPrintList(pkt_object):
     
     # bar_length is the number of characters wide to print the table row borders
-    bar_length = 76
+    bar_length = 152
     
     # This function populates a list full of strings
     printList = []
@@ -47,7 +47,7 @@ def createPrintList(pkt_object):
     # Print if ARP packet
     if pkt_object.ethertype.hex() == '0806':
         # Print ARP stuff
-        printList.append(etherType_table.format(type = 'ARP', data = '0806', description = ''))
+        printList.append(etherType_table.format(type = 'ARP', data = '0806', description = pkt_object.ethertype_desc))
         printList.append(etherTypedata_table.format(type = '', data = 'Hardware Type: '+pkt_object.arp.hardware_type.hex().upper().lstrip('0'), description = ''))
         printList.append(etherTypedata_table.format(type = '', data = 'Protocol Type: '+pkt_object.arp.protocol_type.hex().upper(), description = ''))
         printList.append(etherTypedata_table.format(type = '', data = 'Hardware Size: '+pkt_object.arp.hardware_size.hex().upper().lstrip('0'), description = ''))
