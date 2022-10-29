@@ -11,8 +11,8 @@
 #
 # This is used for testing only
 #
-import functions.printPKTinfo as printPKTinfo
-import functions.sdnParser as sdnParser
+from functions import printPKTinfo
+from functions import sdnParser
 
 
 hex_packets = open('library/hexdata.txt','r').readlines()
@@ -22,15 +22,17 @@ hex_packets = open('library/hexdata.txt','r').readlines()
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
 for hex_string in hex_packets:
-    
+
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
 
     # create an object with the packet's information parsed
-    pkt_object = sdnParser.Packet(pkt)
+    Packet = sdnParser.Packet(pkt)
 
     # print the objects information to console
-    printPKTinfo.printPKTinfo(pkt_object)
+    printPKTinfo.printPKTinfo(Packet)
+
+
     break
 
 
