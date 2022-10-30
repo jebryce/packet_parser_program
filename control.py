@@ -13,7 +13,7 @@
 #
 from functions import printPKTinfo
 from functions import sdnParser
-
+import psutil
 
 hex_packets = open('library/hexdata.txt','r').readlines()
 
@@ -32,7 +32,10 @@ for hex_string in hex_packets:
     # print the objects information to console
     printPKTinfo.printPKTinfo(Packet)
 
+    # to make sure I am deleting large description dictionaries
+    print(psutil.Process().memory_info().rss / (1024*1024))
 
+    
     break
 
 
