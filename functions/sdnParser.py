@@ -109,6 +109,8 @@ class arp:
         # ex: 80 AB 01 01 (type: bytes)     
         self.target_ip_address = arp_packet[24:28]
 
+        self.desc = sdnParserDescriptions.arpDesc(self)
+
 
 class ipv4:
     pass

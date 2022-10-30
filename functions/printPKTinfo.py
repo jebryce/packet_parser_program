@@ -100,7 +100,7 @@ def createPrintList(Packet):
         print_info_data(
             type = 'VLAN ID',
             data = Packet.vlan_id.hex().upper().lstrip('0'), 
-            # desc = Packet.desc.vlan_id
+            desc = Packet.desc.vlan_id
         )
         print_info_line()
 
@@ -111,58 +111,58 @@ def createPrintList(Packet):
         print_info_data( 
             type = 'Hardware Type',
             data = Packet.arp.hardware_type.hex().upper().lstrip('0'), 
-            # desc = Packet.desc.arp.hardware_type
+            desc = Packet.arp.desc.hardware_type
         )
         print_info_data(
             type = 'Protocol Type', 
             data = Packet.arp.protocol_type.hex().upper(), 
-            desc = ''
+            desc = Packet.arp.desc.protocol_type
         )
         print_info_data(
             type = 'Hardware Size', 
             data = Packet.arp.hardware_size.hex().upper().lstrip('0'), 
-            desc = ''
+            desc = Packet.arp.desc.hardware_size
         )
         print_info_data(
             type = 'Protocol Size', 
             data = Packet.arp.protocol_size.hex().upper().lstrip('0'), 
-            desc = ''
+            desc = Packet.arp.desc.protocol_size
         )
         print_info_data(
             type = 'Opcode', 
             data = Packet.arp.opcode.hex().upper().lstrip('0'), 
-            desc = ''
+            desc = Packet.arp.desc.opcode
         )
         
         # ARP provides MAC address as well, but it is different when 
         # Opcode = 1 (request)
         print_bar()
-        print_address(type = 'Type', data = 'MAC Address', desc='Vendor ID')
+        print_address(type = 'Type', data = 'Hardware Address', desc='Vendor ID')
         print_address_line()
         print_address(
             type = 'ARP Sender', 
             data = Packet.arp.sender_mac_address.hex(':').upper(), 
-            desc = ''
+            desc = Packet.arp.desc.sender_mac_address
         )
         print_address(
             type = 'ARP Target', 
             data = Packet.arp.target_mac_address.hex(':').upper(), 
-            desc = ''
+            desc = Packet.arp.desc.target_mac_address
         )
         print_address_line()
 
         # IP address
-        print_address(type = 'Type', data = 'IP Address', desc='Location')
+        print_address(type = 'Type', data = 'Protocol Address', desc='Location')
         print_address_line()
         print_address(
             type = 'ARP Sender', 
             data = bytes2ip.format(*Packet.arp.sender_ip_address), 
-            desc = ''
+            desc = Packet.arp.desc.sender_ip_address
         )
         print_address(
             type = 'ARP Target', 
             data = bytes2ip.format(*Packet.arp.target_ip_address), 
-            desc = ''
+            desc = Packet.arp.desc.target_ip_address
         )
 
 
