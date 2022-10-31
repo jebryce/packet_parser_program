@@ -34,7 +34,7 @@ def get_list_from_url(url):
     
 def make_mac_lookup():
     # Where the mac address lookup table will be located
-    write_path = 'library/mac_lookup.py'
+    write_path = 'library/mac_lookup'
 
     # TODO: create logger :/
     print('Creating', write_path)
@@ -86,29 +86,10 @@ def make_mac_lookup():
             # consolidates all the csv data from the multiple urls
             all_vendor_ids.append(row)
 
-    # will be populated with strings to be written to a file
-    writeList = list()
-    writeList.append('# Created using /library/makeDescriptions.py')
-    writeList.append('# see for more info')
-    writeList.append(' ')
-    writeList.append('mac_lookup = {')
-
-    # example of what this for loop creates: (starts with a tab)
-    #       'CA1E45' : 'ASMedia Technology Inc.',
-    for row in all_vendor_ids:
-        row[1] = row[1].replace("'","\\'")
-        writeList.append("\t'{}' : '{}',".format(*row))
-    writeList.append('}')
-    
-    # decided to create a python dict with our info as it is easy to search 
-    # using a mac address (as a key) to find the organization that owns it (as 
-    # the value in the key : value pair)
-    # size of dict is about 2.6MB, (which can get concerning)
-    #
-    # write_path defined at start of function
     with open(write_path, 'w', encoding='utf-8') as mac_lookup_file:
-        for line in writeList:
-            mac_lookup_file.write(line+'\n')
+        mac_lookup_file.write('# Created using /library/makeDescriptions.py\n')
+        for row in all_vendor_ids:
+            mac_lookup_file.write(row[0]+' '+row[1]+'\n')
 
     # TODO: create logger :/
     print(write_path, 'created')

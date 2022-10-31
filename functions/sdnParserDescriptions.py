@@ -24,7 +24,6 @@
 #
 from library import EtherType_dict
 
-
 def mac_address_desc(*args):
     # takes in a number of 6 octet mac addresses
     # returns the same number strings with the organization that owns each 
@@ -32,25 +31,56 @@ def mac_address_desc(*args):
     #
     # decided to make this a global function as multiple description classes 
     # need descriptions for mac addresses
-    arg_desc_list = list()
-    for arg in args:
-        if arg.hex(':').upper() == 'FF:FF:FF:FF:FF:FF':
-            arg_desc = 'Broadcast'
-        elif arg.hex(':') == '00:00:00:00:00:00':
-            arg_desc = 'Target not yet known.'
-        else:
-            from library import mac_lookup
-            assigned_lengths = [6, 7, 9]
-            for length in assigned_lengths:
-                arg_desc = mac_lookup.mac_lookup.get(
-                    arg.hex().upper()[0:length]
-                )
-                if arg_desc != None:
-                    break
-        arg_desc_list.append(arg_desc)
 
-    del mac_lookup.mac_lookup
+
+
+    file_location = 'library/mac_lookup'
+    with open(file_location, 'r', encoding='utf-8') as mac_lookup:
+
+        # arg_desc_list will be returned, will be a list of strings
+        arg_desc_list = list()
+
+        # this will be mac addresses that aren't broadcast, and will then be 
+        # looked up from table
+        no_desc_args = list()
+
+
+        # first check if mac address is broadcast
+        for arg in args:
+            if arg.hex(':').upper() == 'FF:FF:FF:FF:FF:FF':
+                arg_desc = 'Broadcast'
+                arg_desc_list.append(arg_desc)
+            elif arg.hex(':') == '00:00:00:00:00:00':
+                arg_desc = 'Target not yet known.'
+                arg_desc_list.append(arg_desc)
+            else:
+                no_desc_args.append(arg)
+
+        # if mac address isn't broadcast, lookup from file
+        for arg in no_desc_args:
+            for row in mac_lookup:
+                # splits each row into a list of two values, first value is the 
+                # address block assigned, and the second vlaue is the 
+                # organization that owns the address block
+                # ex: ['0001C7', 'Cisco Systems, Inc\n'] (type:list)
+                row = row.split(' ', 1)
+
+                # length of address block assigned to organization
+                # ex: 6 (type: int) (this can only be 6,7, or 9)
+                assigned_length = len(row[0])
+
+                if arg.hex().upper()[:assigned_length] == row[0]:
+                    arg_desc = row[1].replace('\n', '')
+                    arg_desc_list.append(arg_desc)
+                    break
     
+    # in case mac address isn't found in file
+    # note, if you buy a mac block from IEEE (say a six octet block for $3,180),
+    # there is an optional yearly fee to have IEEE not publish that you own the 
+    # block (for a six octet block it costs $3,675)
+    while len(arg_desc_list) != len(args):
+        arg_desc_list.append('No Vendor ID found.')
+
     return arg_desc_list
 
 
