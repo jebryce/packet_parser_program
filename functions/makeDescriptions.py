@@ -34,7 +34,7 @@ def get_list_from_url(url):
     
 def make_mac_lookup():
     # Where the mac address lookup table will be located
-    write_path = 'library/mac_lookup'
+    write_path = 'library/mac_lookup_test'
 
     # TODO: create logger :/
     print('Creating', write_path)
@@ -56,40 +56,25 @@ def make_mac_lookup():
         'Company ID (CID)' : 'http://standards-oui.ieee.org/cid/cid.csv',
     }
 
-    # this will be populated by nested lists that contain a 6-9 octet string 
-    # (the first 6-9 octets of a MAC address), and the respective Organization 
-    # that owns it 
-    # ex: [ ['00D0EF', 'IGT'], ['405582', 'Nokia'] ]
-    all_vendor_ids = list()
-
-    for url_key in urls:
-        # vendor_ids would be a list of lists, with the following date in each 
-        # nested list: 
-        # Registry, Assignment, Organization Name, Organization Address
-        # (Assignment is a 6-9 octet string - the first 6-9 octets 
-        # of a MAC address)
-        # ex: MA-L, 405582, Nokia, 600 March Road Kanata Ontario CA K2K 2E6 
-        vendor_ids = get_list_from_url(urls[url_key])
-
-        for row in vendor_ids:
-            # removes the first and last items of each row - effectively 
-            # removing the first (Registry) and last (Organization Address) 
-            # columns of the original csv file
-            row.pop()
-            row.pop(0)
-
-            # after edtting, vendor_ids is still a list of lists, but each 
-            # nested list now contains a 6-9 octet string (the first 6-9 octets 
-            # of a MAC address), and the respective Organization that owns it 
-            # ex: [ ['00D0EF', 'IGT'], ['405582', 'Nokia'] ]
-
-            # consolidates all the csv data from the multiple urls
-            all_vendor_ids.append(row)
-
     with open(write_path, 'w', encoding='utf-8') as mac_lookup_file:
         mac_lookup_file.write('# Created using /library/makeDescriptions.py\n')
-        for row in all_vendor_ids:
-            mac_lookup_file.write(row[0]+' '+row[1]+'\n')
+        for url_key in urls:
+            # vendor_ids would be a list of lists, with the following data in
+            # each nested list: 
+            # Registry, Assignment, Organization Name, Organization Address
+            # (Assignment is a 6-9 octet string - the first 6-9 octets 
+            # of a MAC address)
+            # ex: MA-L, 405582, Nokia, 600 March Road Kanata Ontario CA K2K 2E6 
+            vendor_ids = get_list_from_url(urls[url_key])
+
+            for row in vendor_ids:
+                # only writes columns 1 and 3, aka the 6-9 octet string (the 
+                # first 6-9 octets of a MAC address), and the respective 
+                # Organization that owns it 
+                # ex: 
+                # 00D0EF IGT\n
+                # 405582 Nokia\n
+                mac_lookup_file.write(row[1]+' '+row[3]+'\n')
 
     # TODO: create logger :/
     print(write_path, 'created')
