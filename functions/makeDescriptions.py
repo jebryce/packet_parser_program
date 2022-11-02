@@ -34,7 +34,7 @@ def get_list_from_url(url):
     
 def make_mac_lookup():
     # Where the mac address lookup table will be located
-    write_path = 'library/mac_lookup_test'
+    write_path = 'library/mac_lookup'
 
     # TODO: create logger :/
     print('Creating', write_path)

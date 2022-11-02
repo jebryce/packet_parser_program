@@ -10,12 +10,17 @@
 #
 import hexdump
 import os
-def createPrintList(Packet):
+def printPKTinfo(Packet, console=True, file_path=None):
     # Packet variable is an object of Packet class defined 
     # in /functions/sdnParser.py
 
-    # This function populates a list full of strings
-    printList = []
+    # prints each line to either the console, a file, or both
+    def optional_print(line):
+        if file_path != None:
+            with open(file_path, 'a') as packet_info_file:
+                packet_info_file.write(line+'\n')
+        if console == True:
+            print(line)
 
     # bar_length is the number of characters wide to print the table row borders
     bar_length = 100
@@ -27,24 +32,24 @@ def createPrintList(Packet):
     # ex: '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
     def print_bar():
         bar = bar_length*'%'
-        return printList.append(bar)
+        return optional_print(bar)
 
     # ex: '         Type |    MAC Address    | Vendor ID'
     def print_address(type = None, data = None, desc = None):
         pkt_address_table = "  {type:>11} | {data:^17} | {desc}"
-        return printList.append(pkt_address_table.format(
+        return optional_print(pkt_address_table.format(
                 type = type, data = data, desc = desc
             ))
     
     # ex: '--------------+-------------------+---------------------------------'
     def print_address_line():
         address_line = 14*'-'+'+'+19*'-'+'+'+(bar_length-35)*'-'
-        return printList.append(address_line)
+        return optional_print(address_line)
 
     # ex: '    EtherType | Value (numbers are in hex)     | Description'
     def print_info(type = None, data = None, desc = None):
         pkt_info_table = "  {type:>11} | {data:<30} | {desc}"
-        return printList.append(pkt_info_table.format(
+        return optional_print(pkt_info_table.format(
                 type = type, data = data, desc = desc
             ))
         
@@ -52,14 +57,14 @@ def createPrintList(Packet):
     def print_info_data(type = None, data = None, desc = None):
         type_data = type+': '+ data
         pkt_info_data_table = 14*' '+"|--> {type_data:<27} | {desc}"
-        return printList.append(pkt_info_data_table.format(
+        return optional_print(pkt_info_data_table.format(
                type_data = type_data, desc = desc
             ))
 
     # ex: '--------------+--------------------------------+--------------------'
     def print_info_line():
         info_line = 14*'-'+'+'+32*'-'+'+'+(bar_length-48)*'-'
-        return printList.append(info_line)
+        return optional_print(info_line)
 
     # Honestly am surprised this worked
     bytes2ip = '{}.{}.{}.{}'
@@ -167,17 +172,16 @@ def createPrintList(Packet):
 
 
     print_bar()
-    return printList
     
 
-def printPKTinfo(Packet):
-    printList = createPrintList(Packet)
+# def printPKTinfo(Packet):
+#     printList = createPrintList(Packet)
 
-    #os.system('cls')
+#     #os.system('cls')
     
-    for line in printList:
-        print(line)
+#     for line in printList:
+#         print(line)
 
-    hexdump.hexdump(Packet.packet)
+#     hexdump.hexdump(Packet.packet)
 
 
