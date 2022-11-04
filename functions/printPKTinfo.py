@@ -9,62 +9,17 @@
 # print to either the console or a text file (or both!).
 #
 import hexdump
-import os
-def printPKTinfo(Packet, console=True, file_path=None):
+from functions import print_functions
+
+
+
+
+
+def printPKTinfo(Packet):
     # Packet variable is an object of Packet class defined 
     # in /functions/sdnParser.py
 
-    # prints each line to either the console, a file, or both
-    def optional_print(line):
-        if file_path != None:
-            with open(file_path, 'a') as packet_info_file:
-                packet_info_file.write(line+'\n')
-        if console == True:
-            print(line)
-
-    # bar_length is the number of characters wide to print the table row borders
-    bar_length = 100
-
-    # Initialize string formats
-    # I created this functions, as it imo it is more readable to code
-    # print_address() instead of printList.append(pkt_address_table.format()) 
-
-    # ex: '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-    def print_bar():
-        bar = bar_length*'%'
-        return optional_print(bar)
-
-    # ex: '         Type |    MAC Address    | Vendor ID'
-    def print_address(type = None, data = None, desc = None):
-        pkt_address_table = "  {type:>11} | {data:^17} | {desc}"
-        return optional_print(pkt_address_table.format(
-                type = type, data = data, desc = desc
-            ))
-    
-    # ex: '--------------+-------------------+---------------------------------'
-    def print_address_line():
-        address_line = 14*'-'+'+'+19*'-'+'+'+(bar_length-35)*'-'
-        return optional_print(address_line)
-
-    # ex: '    EtherType | Value (numbers are in hex)     | Description'
-    def print_info(type = None, data = None, desc = None):
-        pkt_info_table = "  {type:>11} | {data:<30} | {desc}"
-        return optional_print(pkt_info_table.format(
-                type = type, data = data, desc = desc
-            ))
-        
-    # ex: '              |--> VLAN ID: 3                  | SDN Production VLAN'
-    def print_info_data(type = None, data = None, desc = None):
-        type_data = type+': '+ data
-        pkt_info_data_table = 14*' '+"|--> {type_data:<27} | {desc}"
-        return optional_print(pkt_info_data_table.format(
-               type_data = type_data, desc = desc
-            ))
-
-    # ex: '--------------+--------------------------------+--------------------'
-    def print_info_line():
-        info_line = 14*'-'+'+'+32*'-'+'+'+(bar_length-48)*'-'
-        return optional_print(info_line)
+    pf = print_functions.print_functions()
 
     # Honestly am surprised this worked
     bytes2ip = '{}.{}.{}.{}'
@@ -75,15 +30,15 @@ def printPKTinfo(Packet, console=True, file_path=None):
 
     
     # Print MAC address info
-    print_bar()
-    print_address(type = 'Type', data = 'MAC Address', desc='Vendor ID')
-    print_address_line()
-    print_address(
+    pf.print_bar()
+    pf.print_address(type = 'Type', data = 'MAC Address', desc='Vendor ID')
+    pf.print_address_line()
+    pf.print_address(
         type = 'Source', 
         data = Packet.source_mac_address.hex(':').upper(), 
         desc = Packet.desc.source_mac_address
     )
-    print_address(
+    pf.print_address(
         type = 'Destination', 
         data = Packet.destination_mac_address.hex(':').upper(), 
         desc = Packet.desc.destination_mac_address
@@ -91,49 +46,49 @@ def printPKTinfo(Packet, console=True, file_path=None):
 
     
     # Print EtherType info
-    print_bar()
-    print_info(
+    pf.print_bar()
+    pf.print_info(
         type = 'EtherType', 
         data = 'Value (numbers are in hex)', 
         desc = 'Description'
     )
-    print_info_line()
+    pf.print_info_line()
 
     # Print if tagged traffic
     if Packet.tagged == True:
-        print_info(type = '802.1Q', data = '8100', desc = Packet.desc.tagged)
-        print_info_data(
+        pf.print_info(type = '802.1Q', data = '8100', desc = Packet.desc.tagged)
+        pf.print_info_data(
             type = 'VLAN ID',
             data = Packet.vlan_id.hex().upper().lstrip('0'), 
             desc = Packet.desc.vlan_id
         )
-        print_info_line()
+        pf.print_info_line()
 
     # Print if ARP packet
     if Packet.ethertype.hex() == '0806':
         # Print ARP stuff
-        print_info(type = 'ARP', data = '0806', desc = Packet.desc.ethertype)
-        print_info_data( 
+        pf.print_info(type = 'ARP', data = '0806', desc = Packet.desc.ethertype)
+        pf.print_info_data( 
             type = 'Hardware Type',
             data = Packet.arp.hardware_type.hex().upper().lstrip('0'), 
             desc = Packet.arp.desc.hardware_type
         )
-        print_info_data(
+        pf.print_info_data(
             type = 'Protocol Type', 
             data = Packet.arp.protocol_type.hex().upper(), 
             desc = Packet.arp.desc.protocol_type
         )
-        print_info_data(
+        pf.print_info_data(
             type = 'Hardware Size', 
             data = Packet.arp.hardware_size.hex().upper().lstrip('0'), 
             desc = Packet.arp.desc.hardware_size
         )
-        print_info_data(
+        pf.print_info_data(
             type = 'Protocol Size', 
             data = Packet.arp.protocol_size.hex().upper().lstrip('0'), 
             desc = Packet.arp.desc.protocol_size
         )
-        print_info_data(
+        pf.print_info_data(
             type = 'Opcode', 
             data = Packet.arp.opcode.hex().upper().lstrip('0'), 
             desc = Packet.arp.desc.opcode
@@ -141,47 +96,43 @@ def printPKTinfo(Packet, console=True, file_path=None):
         
         # ARP provides MAC address as well, but it is different when 
         # Opcode = 1 (request)
-        print_bar()
-        print_address(type = 'Type', data = 'Hardware Address', desc='Vendor ID')
-        print_address_line()
-        print_address(
+        pf.print_bar()
+        pf.print_address(
+            type = 'Type', 
+            data = 'Hardware Address', 
+            desc='Vendor ID'
+        )
+        pf.print_address_line()
+        pf.print_address(
             type = 'ARP Sender', 
             data = Packet.arp.sender_mac_address.hex(':').upper(), 
             desc = Packet.arp.desc.sender_mac_address
         )
-        print_address(
+        pf.print_address(
             type = 'ARP Target', 
             data = Packet.arp.target_mac_address.hex(':').upper(), 
             desc = Packet.arp.desc.target_mac_address
         )
-        print_address_line()
+        pf.print_address_line()
 
         # IP address
-        print_address(type = 'Type', data = 'Protocol Address', desc='Location')
-        print_address_line()
-        print_address(
+        pf.print_address(
+            type = 'Type', 
+            data = 'Protocol Address', 
+            desc='Location'
+        )
+        pf.print_address_line()
+        pf.print_address(
             type = 'ARP Sender', 
             data = bytes2ip.format(*Packet.arp.sender_ip_address), 
             desc = Packet.arp.desc.sender_ip_address
         )
-        print_address(
+        pf.print_address(
             type = 'ARP Target', 
             data = bytes2ip.format(*Packet.arp.target_ip_address), 
             desc = Packet.arp.desc.target_ip_address
         )
 
 
-    print_bar()
+    pf.print_bar()
     
-
-# def printPKTinfo(Packet):
-#     printList = createPrintList(Packet)
-
-#     #os.system('cls')
-    
-#     for line in printList:
-#         print(line)
-
-#     hexdump.hexdump(Packet.packet)
-
-
