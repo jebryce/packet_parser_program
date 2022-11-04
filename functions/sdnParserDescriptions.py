@@ -22,7 +22,8 @@
 # my_Packet.variable                   | calls the data of variable
 # my_Packet.desc.variable              | calls the description of variable
 #
-from library import EtherType_dict
+import os
+PATH = os.getcwd()
 
 def mac_address_desc(*args):
     # takes in a number of 6 octet mac addresses
@@ -34,11 +35,12 @@ def mac_address_desc(*args):
 
 
 
-    file_location = 'library/mac_lookup'
-    with open(file_location, 'r', encoding='utf-8') as mac_lookup:
+    mac_lookup_file = PATH+'/library/mac_lookup'
+    with open(mac_lookup_file, 'r', encoding='utf-8') as mac_lookup:
 
-        # arg_desc_list will be returned, will be a list of strings
-        arg_desc_list = list()
+        # arg_desc_dict will be returned, will be key = X.desc.X variable 
+        # provided, and value = description
+        arg_desc_dict = dict()
 
         # this will be mac addresses that aren't broadcast, and will then be 
         # looked up from table
@@ -48,12 +50,15 @@ def mac_address_desc(*args):
         # first check if mac address is broadcast
         for arg in args:
             if arg.hex(':').upper() == 'FF:FF:FF:FF:FF:FF':
-                arg_desc = 'Broadcast'
-                arg_desc_list.append(arg_desc)
+                arg_desc_dict[arg] = 'Broadcast'
             elif arg.hex(':') == '00:00:00:00:00:00':
-                arg_desc = 'Target not yet known.'
-                arg_desc_list.append(arg_desc)
+                arg_desc_dict[arg] = 'Target not yet known.'
             else:
+                # in case mac address isn't found in file. Note: if you buy a 
+                # mac block from IEEE (say a six octet block for $3,180), there 
+                # is an optional yearly fee to have IEEE not publish that you 
+                # own the block (for a six octet block it costs $3,675)
+                arg_desc_dict[arg] = 'No Vendor ID found.'
                 no_desc_args.append(arg)
 
         # if mac address isn't broadcast, lookup from file
@@ -70,18 +75,10 @@ def mac_address_desc(*args):
                 assigned_length = len(row[0])
 
                 if arg.hex().upper()[:assigned_length] == row[0]:
-                    arg_desc = row[1].replace('\n', '')
-                    arg_desc_list.append(arg_desc)
+                    arg_desc_dict[arg] = row[1].replace('\n', '')
                     break
-    
-    # in case mac address isn't found in file
-    # note, if you buy a mac block from IEEE (say a six octet block for $3,180),
-    # there is an optional yearly fee to have IEEE not publish that you own the 
-    # block (for a six octet block it costs $3,675)
-    while len(arg_desc_list) != len(args):
-        arg_desc_list.append('No Vendor ID found.')
 
-    return arg_desc_list
+    return arg_desc_dict
 
 
 
@@ -89,32 +86,24 @@ def mac_address_desc(*args):
 def EtherTypeDesc(two_octet_field):
     # created as a seperate function as arp shares same descriptions for 
     # protocol type
-    #
-    # looks up ethertype value in dictionary to find description
-    # ex: 'Address Resolution Protocol (ARP)' (type: string)
-    ethertype = EtherType_dict.ethertypes.get(
-        two_octet_field.hex()
-    )                                            
-    # if the key in dictionary.get(key) does not exist, it returns None
+    ethertype_lookup_file = PATH+'/library/ethertype_lookup'
 
-    # this will probably never get called, but essentially does the same as 
-    # previous method, but for rarer ranged ethertypes.
-    if ethertype == None:
-        for key in EtherType_dict.ranged_ethertypes:
-
-            # if the upper value of the range is greater than the ethertype
-            # this works as the dictionary is in incremental order
-            if bytes.fromhex(key[5:]) >= two_octet_field:
-
-                # '\' character indicates expression is on next line
-                # if the key does not exist it returns the string shown
-                ethertype = \
-                    EtherType_dict.ranged_ethertypes.get(
-                        key, "EtherType was not found"
-                    )
+    
+    description = 'Protocol unavailable.'
+    with open(ethertype_lookup_file, 'r', encoding='utf-8') as ethertype_lookup:
+        for row in ethertype_lookup:
+            # splits each row into a list of two values, first value is the 
+            # ethertype, and the second vlaue is the description
+            # ex: (type: list)
+            # ['0806', 'Address Resolution Protocol - A. R. P.\n']
+            row = row.split(' ', 1)
+            if two_octet_field.hex().upper() == row[0]:
+                description = row[1].replace('\n', '')
                 break
-    return ethertype
-        
+
+    return description
+            
+
 
 class PacketDesc():
     def __init__(self, Packet):
@@ -126,14 +115,16 @@ class PacketDesc():
         self.packet = 'Raw packet data.'
 
 
-        self.destination_mac_address, self.source_mac_address = \
-            mac_address_desc(
+        mac_addresses = mac_address_desc(
                 Packet.destination_mac_address, Packet.source_mac_address
             )
-
-        self.tagged = 'Customer VLAN Tagged Type'
+        self.destination_mac_address = \
+            mac_addresses[Packet.destination_mac_address]
+        self.source_mac_address = \
+            mac_addresses[Packet.source_mac_address]
         
         if Packet.tagged == True:
+            self.tagged = 'Customer VLAN Tagged Type' 
             # TODO: create vlan ID lookup
             self.vlan_id = 'SDN Production VLAN'
 

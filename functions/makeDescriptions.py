@@ -7,11 +7,12 @@
 
 import requests
 import csv
-
+import os
+PATH = os.getcwd()
 
 def get_list_from_url(url):
     # takes in a url to a csv file, returns a list containing the data of the 
-    # csv file (minus the first row)
+    # csv file (minus the first (title) row)
 
     # 'with' statement closes session after we are finished with it
     with requests.Session() as request_session:
@@ -34,7 +35,7 @@ def get_list_from_url(url):
     
 def make_mac_lookup():
     # Where the mac address lookup table will be located
-    write_path = 'library/mac_lookup'
+    write_path = PATH + '/library/mac_lookup'
 
     # TODO: create logger :/
     print('Creating', write_path)
@@ -68,7 +69,7 @@ def make_mac_lookup():
             vendor_ids = get_list_from_url(urls[url_key])
 
             for row in vendor_ids:
-                # only writes columns 1 and 3, aka the 6-9 octet string (the 
+                # only writes columns 2 and 4, aka the 6-9 octet string (the 
                 # first 6-9 octets of a MAC address), and the respective 
                 # Organization that owns it 
                 # ex: 
@@ -79,11 +80,69 @@ def make_mac_lookup():
     # TODO: create logger :/
     print(write_path, 'created')
 
+def make_ethertype_lookup():
+    # Where the mac address lookup table will be located
+    write_path = PATH + '/library/ethertype_lookup'
+
+    # TODO: create logger :/
+    print('Creating', write_path)
+
+    # (re)generates a file that contains ethertypes and their descriptions
+    urls = {
+        'Ethertype' : \
+            'http://standards-oui.ieee.org/ethertype/eth.csv'
+    }
+
+    with open(write_path, 'w', encoding='utf-8') as ethertype_lookup_file:
+        ethertype_lookup_file.write('# Created using /library/makeDescriptions.py\n')
+        for url_key in urls:
+
+
+            # ethertypes would be a list of lists, with the following data in
+            # each nested list: 
+            # Registry, Assignment, Organization Name, Organization Address,
+            # Protocol
+            # (Assignment is a 2 octet string - the ethertype
+            # ex: Ethertype, 806, Symbolics, Inc., 
+            # 243 Vassar Street Cambridge  US 02139,
+            # Address Resolution Protocol - A. R. P.
+            ethertypes = get_list_from_url(urls[url_key])
+            for row in ethertypes:
+                
+
+                # If this isn't added, there would be ~3287 lines that have 
+                # "Protocol unavailable." as a description (which isn't very 
+                # helpful) - there still are some lines with similar 
+                # descriptions, but the number of lines have already been 
+                # decreased by ~90% and can't be bothered tbh
+                if row[4] == 'Protocol unavailable.':
+                    pass
+
+                else:
+                    # for some ethertypes, they are presented as ="88E4" in the 
+                    # csv file (this is because without the quotes: 
+                    # 88E4 = 88 * 10^4 ) there are only ~20 numbers like this
+                    if len(row[1]) != 4:
+                        # row[1] goes from ="88E4" to 88E4
+                        row[1] = row[1][2:-1]
+                        
+
+                    # only writes columns 2 and 5, aka the ethertype and the 
+                    # description of said ethertype
+                    # ex: 
+                    # 0806 Address Resolution Protocol - A. R. P.
+                    ethertype_lookup_file.write(row[1]+' '+row[4]+'\n')
+
+
+    # TODO: create logger :/
+    print(write_path, 'created')
 
 
 
 def main():
-    make_mac_lookup()
+    # make_mac_lookup()
+    make_ethertype_lookup()
+    pass
     
 
 
