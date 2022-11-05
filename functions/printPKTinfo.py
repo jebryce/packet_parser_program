@@ -8,29 +8,36 @@
 # I decided to do it this way, as in the future I would like functionality to 
 # print to either the console or a text file (or both!).
 #
-import hexdump
 from functions import print_functions
 
 
 
 
 
-def printPKTinfo(Packet):
+def printPKTinfo(Packet, console = True, file_path=None, bar_length=150):
     # Packet variable is an object of Packet class defined 
     # in /functions/sdnParser.py
 
-    pf = print_functions.print_functions()
+    # see /functions/print_functions.py for more info. It is just a class that 
+    # contains functions that format and print a string to console.
+    pf = print_functions.print_functions(console, file_path, bar_length)
 
     # Honestly am surprised this worked
+    # this is convert a 4-octet ip address (in type bytes)
+    # to a human-readable ip address in the format int.int.int.int
     bytes2ip = '{}.{}.{}.{}'
     # example: bytes2ip.format(*variable)
-    # need the asterisk
+    # need the asterisk, where variable is a 4-octect bytes object
 
 
 
     
     # Print MAC address info
     pf.print_bar()
+    pf.print_data(
+        column_widths=[15,30]
+        type = 'Type', data = 'MAC Address', desc='Vendor ID'
+    )
     pf.print_address(type = 'Type', data = 'MAC Address', desc='Vendor ID')
     pf.print_address_line()
     pf.print_address(
