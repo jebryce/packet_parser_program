@@ -67,7 +67,8 @@ class Packet:
         if self.ethertype.hex() == '0806':
             self.arp = arp(partialPacket[2:])
         elif self.ethertype.hex() == '0800':
-            self.ipv4 = ipv4(partialPacket[2:])
+            pass
+            # self.ipv4 = ipv4(partialPacket[2:])
 
         # see sdnParserDescriptions for more detail, but it creates 
         # descriptions for a self.variable at self.desc.variable 
