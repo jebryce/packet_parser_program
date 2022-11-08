@@ -12,12 +12,9 @@
 # This is used for testing only
 #
 import psutil
-
 from functions import printPKTinfo
 from functions import sdnParser
-
 import os
-import hexdump
 
 hex_packets = open('library/hexdata.txt','r').readlines()
 

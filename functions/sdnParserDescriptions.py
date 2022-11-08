@@ -123,7 +123,7 @@ class PacketDesc():
         self.source_mac_address = \
             mac_addresses[Packet.source_mac_address]
         
-        if Packet.tagged == True:
+        if Packet.tagged != False:
             self.tagged = 'Customer VLAN Tagged Type' 
             # TODO: create vlan ID lookup
             self.vlan_id = 'SDN Production VLAN'

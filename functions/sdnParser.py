@@ -43,8 +43,8 @@ class Packet:
         # the .hex() function converts the bytes object to a string of hex 
         # values, 8100 is the EtherType 802.1Q (aka tagged traffic)
         if packet[12:14].hex()=='8100':
-            # Decided to use a boolean variable as it is either tagged or not 
-            self.tagged = True
+            # 8100 (type: bytes)
+            self.tagged = packet[12:14]
 
             # ex: 0003 (type: bytes)
             self.vlan_id = packet[14:16]

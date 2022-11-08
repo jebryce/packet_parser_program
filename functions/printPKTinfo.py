@@ -29,77 +29,118 @@ def printPKTinfo(Packet, console = True, file_path=None, bar_length=150):
     # example: bytes2ip.format(*variable)
     # need the asterisk, where variable is a 4-octect bytes object
 
-
+    # these determine the widths of the first two columns for each data type
+    mac_width = [11, 17]
+    arp_width = [13, 26]
 
     
     # Print MAC address info
     pf.print_bar()
     pf.print_data(
-        column_widths=[15,30]
-        type = 'Type', data = 'MAC Address', desc='Vendor ID'
+        column_widths = mac_width,
+        entries = ['Type', 'MAC Address', 'Vendor ID'],
+        just = '^'
     )
-    pf.print_address(type = 'Type', data = 'MAC Address', desc='Vendor ID')
-    pf.print_address_line()
-    pf.print_address(
-        type = 'Source', 
-        data = Packet.source_mac_address.hex(':').upper(), 
-        desc = Packet.desc.source_mac_address
+    pf.print_data_bar(column_widths = mac_width)
+    pf.print_data(
+        column_widths = mac_width,
+        entries = [
+            'Source',
+            Packet.source_mac_address.hex(':').upper(), 
+            Packet.desc.source_mac_address
+        ],
+        just = '^'
     )
-    pf.print_address(
-        type = 'Destination', 
-        data = Packet.destination_mac_address.hex(':').upper(), 
-        desc = Packet.desc.destination_mac_address
+    pf.print_data(
+        column_widths = mac_width,
+        entries = [
+            'Destination',
+            Packet.destination_mac_address.hex(':').upper(), 
+            Packet.desc.destination_mac_address
+        ],
+        just = '^'
     )
 
-    
+
     # Print EtherType info
     pf.print_bar()
-    pf.print_info(
-        type = 'EtherType', 
-        data = 'Value (numbers are in hex)', 
-        desc = 'Description'
+    pf.print_data(
+        column_widths=arp_width,
+        entries=['EtherType', 'Value (hex)', 'Description']
     )
-    pf.print_info_line()
+    pf.print_data_bar(column_widths = arp_width)
 
     # Print if tagged traffic
-    if Packet.tagged == True:
-        pf.print_info(type = '802.1Q', data = '8100', desc = Packet.desc.tagged)
-        pf.print_info_data(
-            type = 'VLAN ID',
-            data = Packet.vlan_id.hex().upper().lstrip('0'), 
-            desc = Packet.desc.vlan_id
+    if Packet.tagged != False:
+        pf.print_data(
+            column_widths = arp_width,
+            entries = ['802.1Q', '8100', Packet.desc.tagged]
         )
-        pf.print_info_line()
+        pf.print_data(
+            column_widths = arp_width,
+            entries = [
+                'VLAN ID', 
+                Packet.vlan_id.hex().upper().lstrip('0'),
+                Packet.desc.vlan_id
+            ],
+            arrow_length = 3
+        )
+        pf.print_data_bar(column_widths = arp_width)
 
     # Print if ARP packet
     if Packet.ethertype.hex() == '0806':
         # Print ARP stuff
-        pf.print_info(type = 'ARP', data = '0806', desc = Packet.desc.ethertype)
-        pf.print_info_data( 
-            type = 'Hardware Type',
-            data = Packet.arp.hardware_type.hex().upper().lstrip('0'), 
-            desc = Packet.arp.desc.hardware_type
+        pf.print_data(
+            column_widths = arp_width,
+            entries = ['ARP', '0806', Packet.desc.ethertype]
         )
-        pf.print_info_data(
-            type = 'Protocol Type', 
-            data = Packet.arp.protocol_type.hex().upper(), 
-            desc = Packet.arp.desc.protocol_type
+
+        pf.print_data( 
+            column_widths = arp_width,
+            entries = [
+                'Hardware Type',
+                Packet.arp.hardware_type.hex().upper().lstrip('0'), 
+                Packet.arp.desc.hardware_type
+            ],
+            arrow_length = 3
         )
-        pf.print_info_data(
-            type = 'Hardware Size', 
-            data = Packet.arp.hardware_size.hex().upper().lstrip('0'), 
-            desc = Packet.arp.desc.hardware_size
+        pf.print_data( 
+            column_widths = arp_width,
+            entries = [
+                'Protocol Type',
+                Packet.arp.protocol_type.hex().upper(), 
+                Packet.arp.desc.protocol_type
+            ],
+            arrow_length = 3
         )
-        pf.print_info_data(
-            type = 'Protocol Size', 
-            data = Packet.arp.protocol_size.hex().upper().lstrip('0'), 
-            desc = Packet.arp.desc.protocol_size
+        pf.print_data( 
+            column_widths = arp_width,
+            entries = [
+                'Hardware Size',
+                Packet.arp.hardware_size.hex().upper().lstrip('0'), 
+                Packet.arp.desc.hardware_size
+            ],
+            arrow_length = 3
         )
-        pf.print_info_data(
-            type = 'Opcode', 
-            data = Packet.arp.opcode.hex().upper().lstrip('0'), 
-            desc = Packet.arp.desc.opcode
+        pf.print_data( 
+            column_widths = arp_width,
+            entries = [
+                'Protocol Size',
+                Packet.arp.protocol_size.hex().upper().lstrip('0'), 
+                Packet.arp.desc.protocol_size
+            ],
+            arrow_length = 3
         )
+        pf.print_data( 
+            column_widths = arp_width,
+            entries = [
+                'Opcode',
+                Packet.arp.opcode.hex().upper().lstrip('0'), 
+                Packet.arp.desc.opcode
+            ],
+            arrow_length = 3
+        )
+        
         
         # ARP provides MAC address as well, but it is different when 
         # Opcode = 1 (request)
