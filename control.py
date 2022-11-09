@@ -33,10 +33,10 @@ for hex_string in hex_packets:
     
 
     # print the objects information to console
-    printPKTinfo.printPKTinfo(Packet)
+    printPKTinfo.print_packet_info(Packet)
 
     # to make sure I am deleting large description dictionaries
-    print(psutil.Process().memory_info().rss / (1024*1024))
+    # print(psutil.Process().memory_info().rss / (1024*1024))
 
     #hexdump.hexdump(Packet.packet)
     
