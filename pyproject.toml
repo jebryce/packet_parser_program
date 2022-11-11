@@ -1,0 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "johnParser"
+version = "0.0.1"
+authors = [
+  { name="John Bryce"},
+]
+readme = "README.md"
