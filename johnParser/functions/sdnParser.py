@@ -27,7 +27,7 @@
 # my_Packet.variable                   | calls the data of variable
 # my_Packet.desc.variable              | calls the description of variable
 # 
-from functions import sdnParserDescriptions
+from johnParser.functions import sdnParserDescriptions
 
 class Packet:
     def __init__(self, packet):

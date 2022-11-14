@@ -7,7 +7,18 @@
 import requests
 import csv
 import os
-PATH = os.getcwd()
+PATH = os.path.expanduser('~') + '/Library/johnParser/'
+
+def create_library_folder():
+    if os.path.exists(PATH) == False:
+        try:
+            os.mkdir(PATH)
+        except:
+            print('Creating folder failed!')
+    elif os.path.exists(PATH) == True:
+        print('Path already exists!')
+    else:
+        print('Ran into an error...')
 
 def get_list_from_url(url):
     # takes in a url to a csv file, returns a list containing the data of the 
@@ -37,7 +48,7 @@ def make_mac_lookup():
     # (re)generates a file that contains a dictionary of MAC Vendor IDs
 
     # Where the mac address lookup table will be located
-    write_path = PATH + '/library/mac_lookup'
+    write_path = PATH + 'mac_lookup.txt'
 
     # TODO: create logger :/
     print('Creating', write_path)
@@ -61,7 +72,9 @@ def make_mac_lookup():
 
     # 'with' statement closes file after we are finished with it
     with open(write_path, 'w', encoding='utf-8') as mac_lookup_file:
-        mac_lookup_file.write('# Created using /library/makeDescriptions.py\n')
+        mac_lookup_file.write(
+            '# Created using johnParser/functions/makeDescriptions.py\n'
+        )
         for url_key in urls:
             # vendor_ids would be a list of lists, with the following data in
             # each nested list: 
@@ -89,9 +102,9 @@ def make_ethertype_lookup():
     # (re)generates a file that contains ethertypes and their descriptions
 
     # Where the mac address lookup table will be located
-    write_path = PATH + '/library/ethertype_lookup'
+    write_path = PATH + 'ethertype_lookup.txt'
 
-    # TODO: create logger :/
+    # TODO: create logger :/s
     print('Creating', write_path)
 
     # csv file we will download to get the ethertypes with descriptions
@@ -104,7 +117,7 @@ def make_ethertype_lookup():
         # this is to direct whoever opens the /library/ethertype_lookup file to 
         # here (will be printed on the first line)
         ethertype_lookup_file.write(
-            '# Created using /library/makeDescriptions.py\n'
+            '# Created using johnParser/functions/makeDescriptions.py\n'
         )
 
         # ethertypes would be a list of lists, with the following data in
@@ -152,8 +165,8 @@ def make_ethertype_lookup():
 
 def main():
     # this is for testing, will be removed when implemented fully.
-
-    # make_mac_lookup()
+    create_library_folder()
+    make_mac_lookup()
     make_ethertype_lookup()
     pass
     

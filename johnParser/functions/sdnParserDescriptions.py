@@ -23,7 +23,7 @@
 # my_Packet.desc.variable              | calls the description of variable
 #
 import os
-PATH = os.getcwd()
+PATH = os.path.expanduser('~') + '/Library/johnParser/'
 
 def mac_address_desc(*args):
     # takes in a number of 6 octet mac addresses
@@ -35,7 +35,7 @@ def mac_address_desc(*args):
 
 
 
-    mac_lookup_file = PATH+'/library/mac_lookup'
+    mac_lookup_file = PATH+'mac_lookup.txt'
     with open(mac_lookup_file, 'r', encoding='utf-8') as mac_lookup:
 
         # arg_desc_dict will be returned, will be key = X.desc.X variable 
@@ -86,7 +86,7 @@ def mac_address_desc(*args):
 def EtherTypeDesc(two_octet_field):
     # created as a seperate function as arp shares same descriptions for 
     # protocol type
-    ethertype_lookup_file = PATH+'/library/ethertype_lookup'
+    ethertype_lookup_file = PATH+'ethertype_lookup.txt'
 
     
     description = 'Protocol unavailable.'

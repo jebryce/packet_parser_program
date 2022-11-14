@@ -12,11 +12,13 @@
 # This is used for testing only
 #
 import psutil
-from functions import printPKTinfo
-from functions import sdnParser
+
+from johnParser.functions import printPKTinfo
+from johnParser.functions import sdnParser
 import os
 
-hex_packets = open('library/hexdata.txt','r').readlines()
+
+hex_packets = open('johnParser/library/hexdata.txt','r').readlines()
 
 
 # for each line in the text file, 

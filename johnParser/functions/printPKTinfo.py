@@ -4,7 +4,7 @@
 # 
 # This file contains classes that print the parsed data. 
 # 
-from functions import print_functions
+from johnParser.functions import print_functions
 
 class print_packet_info():
     def __init__(

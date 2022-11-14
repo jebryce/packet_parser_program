@@ -6,7 +6,7 @@
 # pf = print_functions.print_functions()
 # pf.print_bar()
 
-from functions import wrap_line
+from johnParser.functions import wrap_line
 # see /functions/wrap_line.py for more information on what it does (but it 
 # basically just takes a long string and breaks it (at space characters) into 
 # shorter strings)
