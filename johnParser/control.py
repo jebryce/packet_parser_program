@@ -13,8 +13,6 @@
 #
 from johnParser.functions import printPKTinfo
 from johnParser.functions import sdnParser
-from johnParser.functions import make_library
-
 # make_library.make_library()
 
 

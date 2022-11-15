@@ -23,7 +23,8 @@
 # my_Packet.desc.variable              | calls the description of variable
 #
 import os
-PATH = os.path.expanduser('~') + '/Library/johnParser/'
+from johnParser.functions import path
+PATH = path.PATH
 
 def mac_address_desc(*args):
     # takes in a number of 6 octet mac addresses
