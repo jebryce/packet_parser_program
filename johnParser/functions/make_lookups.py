@@ -6,19 +6,8 @@
 
 import requests
 import csv
-import os
-PATH = os.path.expanduser('~') + '/Library/johnParser/'
+from johnParser.functions import log
 
-def create_library_folder():
-    if os.path.exists(PATH) == False:
-        try:
-            os.mkdir(PATH)
-        except:
-            print('Creating folder failed!')
-    elif os.path.exists(PATH) == True:
-        print('Path already exists!')
-    else:
-        print('Ran into an error...')
 
 def get_list_from_url(url):
     # takes in a url to a csv file, returns a list containing the data of the 
@@ -28,8 +17,8 @@ def get_list_from_url(url):
     with requests.Session() as request_session:
         # This is a lengthy process, and this file requests multiple csv files, 
         # this is just used to tell the human it hasn't frozen
-        # TODO: replace with logger
-        print("Requesting csv file from: '{}'".format(url))
+        
+        log.log("\tRequesting csv file from: '{}'".format(url))
 
         # makes the physical request to the url for it's data
         response = request_session.get(url)
@@ -50,8 +39,7 @@ def make_mac_lookup():
     # Where the mac address lookup table will be located
     write_path = PATH + 'mac_lookup.txt'
 
-    # TODO: create logger :/
-    print('Creating', write_path)
+    log.log('Creating: ' + write_path)
 
     # csv files that we will download to create a file of vendor IDs
     urls = {
@@ -95,8 +83,7 @@ def make_mac_lookup():
                 # 405582 Nokia\n
                 mac_lookup_file.write(row[1]+' '+row[3]+'\n')
 
-    # TODO: create logger :/
-    print(write_path, 'created')
+    log.log('Created: ' + write_path)
 
 def make_ethertype_lookup():
     # (re)generates a file that contains ethertypes and their descriptions
@@ -104,8 +91,7 @@ def make_ethertype_lookup():
     # Where the mac address lookup table will be located
     write_path = PATH + 'ethertype_lookup.txt'
 
-    # TODO: create logger :/s
-    print('Creating', write_path)
+    log.log('Creating: ' + write_path)
 
     # csv file we will download to get the ethertypes with descriptions
     url = 'http://standards-oui.ieee.org/ethertype/eth.csv'
@@ -158,22 +144,13 @@ def make_ethertype_lookup():
                 ethertype_lookup_file.write(row[1]+' '+row[4]+'\n')
 
 
-    # TODO: create logger :/
-    print(write_path, 'created')
+    log.log('Created: ' + write_path)
 
 
 
-def main():
+def make_lookups(path):
     # this is for testing, will be removed when implemented fully.
-    create_library_folder()
+    global PATH
+    PATH = path
     make_mac_lookup()
     make_ethertype_lookup()
-    pass
-    
-
-
-
-
-
-
-main()
