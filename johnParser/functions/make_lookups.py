@@ -6,9 +6,8 @@
 
 import requests
 import csv
-from johnParser.functions import log
-
-
+from johnParser.functions import log, path
+import psutil
 def get_list_from_url(url):
     # takes in a url to a csv file, returns a list containing the data of the 
     # csv file (minus the first (title) row)
@@ -25,6 +24,7 @@ def get_list_from_url(url):
 
         # converts response object to raw (text) data
         csv_response = response.text
+        print(csv_response.splitlines())
 
         #converts raw (text) data to a python list
         editted_csv_response = list(csv.reader(csv_response.splitlines()))
@@ -32,6 +32,46 @@ def get_list_from_url(url):
         # removes the title row:
         editted_csv_response.pop(0)
     return editted_csv_response
+'''
+def get_list_from_url(write_path, columns, urls):
+    columns.sort(reverse=True)
+    # takes in a url to a csv file, returns a list containing the data of the 
+    # csv file (minus the first (title) row)
+    print('Before opening requests session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
+    # 'with' statement closes session after we are finished with it
+    with requests.Session() as request_session:
+        with open(write_path, 'w', encoding='utf-8') as lookup_file:
+            lookup_file.write(
+                '# Created using johnParser/functions/makeDescriptions.py\n'
+            )
+
+            print('After opening requests session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
+            # This is a lengthy process, and this file requests multiple csv files, 
+            # this is just used to tell the human it hasn't frozen
+            for url_key in urls:
+                log.log("\tRequesting csv file from: '{}'".format(urls[url_key]))
+
+                print(psutil.Process().memory_info().rss / (1024*1024))
+                # makes the physical request to the url for it's data
+                for raw_row in request_session.get(
+                    urls[url_key], stream = True
+                ).iter_lines():
+                    row = csv.reader([raw_row.decode('utf-8')]).__next__()
+                    for col in columns:
+                        try:
+                            row.pop(col)
+                        except:
+                            print(row)
+
+                    lookup_file.write(' '.join(row)+'\n')
+                    
+
+            print(psutil.Process().memory_info().rss / (1024*1024))
+    
+    
+
+    print('After closing request session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
+'''
     
 def make_mac_lookup():
     # (re)generates a file that contains a dictionary of MAC Vendor IDs
@@ -63,25 +103,9 @@ def make_mac_lookup():
         mac_lookup_file.write(
             '# Created using johnParser/functions/makeDescriptions.py\n'
         )
-        for url_key in urls:
-            # vendor_ids would be a list of lists, with the following data in
-            # each nested list: 
-            # Registry, Assignment, Organization Name, Organization Address
-            # (Assignment is a 6-9 octet string - the first 6-9 octets 
-            # of a MAC address)
-            # ex: MA-L, 405582, Nokia, 600 March Road Kanata Ontario CA K2K 2E6 
-            vendor_ids = get_list_from_url(urls[url_key])
+        
+        get_list_from_url(write_path,[0,3],urls)
 
-            # vendor_ids is a list, this for loop converts that list into the 
-            # formatting used for the file
-            for row in vendor_ids:
-                # only writes columns 2 and 4, aka the 6-9 octet string (the 
-                # first 6-9 octets of a MAC address), and the respective 
-                # Organization that owns it 
-                # ex: 
-                # 00D0EF IGT\n
-                # 405582 Nokia\n
-                mac_lookup_file.write(row[1]+' '+row[3]+'\n')
 
     log.log('Created: ' + write_path)
 
@@ -152,5 +176,7 @@ def make_lookups(path):
     # this is for testing, will be removed when implemented fully.
     global PATH
     PATH = path
-    make_mac_lookup()
+    #make_mac_lookup()
     make_ethertype_lookup()
+
+#make_lookups(path.PATH)
