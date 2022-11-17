@@ -1,3 +1,3 @@
-import os
+import pathlib
 
-PATH = os.path.expanduser('~') + '/Documents/johnParser/'
+PATH = str(pathlib.Path.home()) + '/Documents/johnParser/'

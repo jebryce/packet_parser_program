@@ -1,5 +1,7 @@
-# This is to automake description lookup files
+# This is to automake making description lookup files, see individual functions 
+# for more info
 # 
+# found ethertypes, mac addresses from:
 # https://standards.ieee.org/products-programs/regauth/
 # 
 # 
@@ -7,107 +9,187 @@
 import requests
 import csv
 from johnParser.functions import log, path
-import psutil
-def get_list_from_url(url):
-    # takes in a url to a csv file, returns a list containing the data of the 
-    # csv file (minus the first (title) row)
 
-    # 'with' statement closes session after we are finished with it
-    with requests.Session() as request_session:
-        # This is a lengthy process, and this file requests multiple csv files, 
-        # this is just used to tell the human it hasn't frozen
-        
-        log.log("\tRequesting csv file from: '{}'".format(url))
 
-        # makes the physical request to the url for it's data
-        response = request_session.get(url)
+def request_to_file(write_path, data_remover_function, *urls):
+    # takes in any amount of urls (to csv files (excel, spreadsheet data 
+    # format), creates a file at write_path, then passes each row of the csv
+    # file through data_remover_function
+    #
+    # example write_path: (type: string)
+    # '/Users/john/Documents/johnParser/mac_lookup.txt'
+    #
+    # example data_remover_function: (type: (custom) function)
+    # data_remover_mac          (see function declaration below)
+    #
+    # example urls: (type: string) (as many strings as you want)
+    # 'http://standards-oui.ieee.org/oui/oui.csv'
 
-        # converts response object to raw (text) data
-        csv_response = response.text
-        print(csv_response.splitlines())
 
-        #converts raw (text) data to a python list
-        editted_csv_response = list(csv.reader(csv_response.splitlines()))
-
-        # removes the title row:
-        editted_csv_response.pop(0)
-    return editted_csv_response
-'''
-def get_list_from_url(write_path, columns, urls):
-    columns.sort(reverse=True)
-    # takes in a url to a csv file, returns a list containing the data of the 
-    # csv file (minus the first (title) row)
-    print('Before opening requests session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
     # 'with' statement closes session after we are finished with it
     with requests.Session() as request_session:
         with open(write_path, 'w', encoding='utf-8') as lookup_file:
+
+            # write a breadcrumb? back to here if anyone is curious
             lookup_file.write(
                 '# Created using johnParser/functions/makeDescriptions.py\n'
             )
 
-            print('After opening requests session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
-            # This is a lengthy process, and this file requests multiple csv files, 
-            # this is just used to tell the human it hasn't frozen
-            for url_key in urls:
-                log.log("\tRequesting csv file from: '{}'".format(urls[url_key]))
+            # iterate through the passed urls
+            for url in urls:
 
-                print(psutil.Process().memory_info().rss / (1024*1024))
+
+                # tell the human we are making progress, as making some of the 
+                # lookup files takes a while
+                #
+                # see johnParser/functions/log.py (writes to file in the same 
+                # directory as these lookup files)
+                log.log("\tRequesting csv file from: '{}'".format(url))
+
+                # this is janky, I wanted to process the spreadsheet by loading 
+                # each row into memory individually, instead of loading the 
+                # entire spreadsheet at once (to save memory)
+                #
+                # I ran into a problem where if the cell of memory in the 
+                # spreadsheet had a newline character, then the .iter_lines() 
+                # would count that as a newline itself and not as part of the 
+                # string occupying that cell. 
+                #
+                # For example the spreadsheet row might be: 
+                # 'Assingment,"Description \n with a newline"\n'
+                # and the iter_lines() would break that into two lines instead 
+                # of one. 
+                # 
+                # This buffer is to hold the current partial row until the 
+                # program has found the entire row. 
+                # 
+                # Extending this previous example, buffer would store:
+                # 'Assingment,"Description', 
+                # then the next iteration would add the rest of the row to this 
+                # buffer with the result of 
+                # 'Assingment,"Description with a newline"'
+                buffer = ''
+                
                 # makes the physical request to the url for it's data
+                #
+                # since I passed stream = True, the data will be processed as 
+                # the computer receives it, and the .iter_lines() call breaks 
+                # into lines to process
                 for raw_row in request_session.get(
-                    urls[url_key], stream = True
+                    url, stream = True
                 ).iter_lines():
-                    row = csv.reader([raw_row.decode('utf-8')]).__next__()
-                    for col in columns:
-                        try:
-                            row.pop(col)
-                        except:
-                            print(row)
-
-                    lookup_file.write(' '.join(row)+'\n')
+                
+                    # see description above for what buffer does,
+                    #
+                    # raw_row is received as a bytes object, this also decodes 
+                    # it into text (utf-8)
+                    #
+                    # type is now a string
+                    raw_row = buffer + raw_row.decode('utf-8')
                     
+                    # this is how I checked if I received a full row or a 
+                    # partial one 
+                    #
+                    # basically if there was a newline in a cell, then the csv 
+                    # format would save the contents of that cell surrounded 
+                    # with double quotes, so if the .iter_lines() provides a 
+                    # string with an odd number of " characters, then it must 
+                    # be a partial row 
+                    # 
+                    # (aka the number of " characters mod 2 = 1)
+                    if raw_row.count('"') % 2 == 1:
+                        # store the partial row in the buffer (type: string)
+                        buffer = raw_row + ' '
 
-            print(psutil.Process().memory_info().rss / (1024*1024))
-    
-    
+                    # for some reason iter_lines() would send a blankline,
+                    # if so then we ignore it
+                    elif raw_row != '':
+                        # csv.reader() cannot take a string as input, so we 
+                        # convert it to a list, and it returns a csv.reader() 
+                        # object, so .__next__() returns a list containg the 
+                        # spreadsheet row's contents
+                        #
+                        # the .__next__() is enough as the csv.reader object 
+                        # only was passed one row
+                        #
+                        # variable 'row' is type list
+                        row = csv.reader([raw_row]).__next__()
+                        
+                        # since row is a list, the function does not have to 
+                        # return anything, but the way I have it set up, the 
+                        # function needs to return something (True) and if we 
+                        # want to skip a row, we can return False and it
+                        # won't write anything to the file
+                        #
+                        # lists are 'changeable' so the variable that is passed 
+                        # to the data_remover_function, is the same variable 
+                        # that is written to the file
+                        if data_remover_function(row):
+                            # joins each item in the list row, with a 
+                            # seperation of a space
+                            lookup_file.write(' '.join(row) + '\n')
 
-    print('After closing request session, memory: ',psutil.Process().memory_info().rss / (1024*1024))
-'''
+                        # reset buffer for next potential split line
+                        buffer = ''
+    # In case you are wondering if processing the data as we get it takes 
+    # longer or how much memory it really saves, I tested it, and from 
+    # processing the 31925 line spreadsheet from url 'http://standards-oui.ieee.
+    # org/oui/oui.csv' 5 times with the method as shown, and the previous 
+    # method (not shown, but it just loaded the entire received spreadsheet 
+    # into memory then processed it) I found the following statistics:
+    #
+    # on average the old method used 30.05 MB of memory and took 2.994 secs
+    # 
+    # on average the new method used 4.044 MB of memory and took 3.285 secs
+    #
+    # new/old (what fraction of the old does the new take)
+    # new/old memory = 0.1346, new/old time = 1.09719
+    #
+    # for percentage multiples: 
+    # memory = old/new * 100%, old method takes 743% more memory
+    # memory = new/old * 100%, new method takes 13.46% the memory
+    # time = old/new * 100%,       old method took 91.1% the time
+    # time = (new/old - 1) * 100%, new method takes 9.72% longer
+
     
 def make_mac_lookup():
-    # (re)generates a file that contains a dictionary of MAC Vendor IDs
+    # sets up the call to the request_to_file function for the mac address 
+    # lookup file
 
     # Where the mac address lookup table will be located
     write_path = PATH + 'mac_lookup.txt'
 
+    # see johnParser/functions/log.py
     log.log('Creating: ' + write_path)
 
     # csv files that we will download to create a file of vendor IDs
-    urls = {
-        'MAC Address Block Large (MA-L)' : \
-            'http://standards-oui.ieee.org/oui/oui.csv',
+    urls = [
+        'http://standards-oui.ieee.org/oui/oui.csv',
+        'http://standards-oui.ieee.org/oui28/mam.csv',
+        'http://standards-oui.ieee.org/oui36/oui36.csv',
+        'http://standards-oui.ieee.org/iab/iab.csv',
+        'http://standards-oui.ieee.org/cid/cid.csv'
+    ]
 
-        'MAC Address Block Medium (MA-M)' : \
-            'http://standards-oui.ieee.org/oui28/mam.csv',
+    # see the function request_to_file for more info
+    request_to_file(write_path,data_remover_mac,*urls)
 
-        'MAC Address Block Small (MA-S)' : \
-            'http://standards-oui.ieee.org/oui36/oui36.csv',
-        
-        'Individual Address Block (IAB)' : \
-            'http://standards-oui.ieee.org/iab/iab.csv',
-        
-        'Company ID (CID)' : 'http://standards-oui.ieee.org/cid/cid.csv',
-    }
-
-    # 'with' statement closes file after we are finished with it
-    with open(write_path, 'w', encoding='utf-8') as mac_lookup_file:
-        mac_lookup_file.write(
-            '# Created using johnParser/functions/makeDescriptions.py\n'
-        )
-        
-        get_list_from_url(write_path,[0,3],urls)
-
-
+    # see johnParser/functions/log.py
     log.log('Created: ' + write_path)
+
+def data_remover_mac(list_row):
+    # see functions make_mac_lookup and request_to_file
+
+    # list_row will start as something like:
+    # ['Registry', 'Assignment', 'Organization Name', 'Organization Address']
+    # then removes the third (last) and first entries to end up with:
+    # ['Assignment', 'Organization Name']
+    list_row.pop(3)
+    list_row.pop(0)
+
+    # returns true to print to file
+    return True
+
 
 def make_ethertype_lookup():
     # (re)generates a file that contains ethertypes and their descriptions
@@ -115,60 +197,45 @@ def make_ethertype_lookup():
     # Where the mac address lookup table will be located
     write_path = PATH + 'ethertype_lookup.txt'
 
+    # see johnParser/functions/log.py
     log.log('Creating: ' + write_path)
 
     # csv file we will download to get the ethertypes with descriptions
     url = 'http://standards-oui.ieee.org/ethertype/eth.csv'
+
+    # see the function request_to_file for more info
+    request_to_file(write_path,data_remover_ethertype,url)
     
-
-    # 'with' statement closes file after we are finished with it
-    with open(write_path, 'w', encoding='utf-8') as ethertype_lookup_file:
-
-        # this is to direct whoever opens the /library/ethertype_lookup file to 
-        # here (will be printed on the first line)
-        ethertype_lookup_file.write(
-            '# Created using johnParser/functions/makeDescriptions.py\n'
-        )
-
-        # ethertypes would be a list of lists, with the following data in
-        # each nested list: 
-        # Registry, Assignment, Organization Name, Organization Address,
-        # Protocol
-        # (Assignment is a 2 octet string - the ethertype
-        # ex: Ethertype, 806, Symbolics, Inc., 
-        # 243 Vassar Street Cambridge  US 02139,
-        # Address Resolution Protocol - A. R. P.
-        ethertypes = get_list_from_url(url)
-        # ethertypes is a list, this for loop converts that list into the 
-        # formatting used for the file
-        for row in ethertypes:
-            
-
-            # If this isn't added, there would be ~3287 lines that have 
-            # "Protocol unavailable." as a description (which isn't very 
-            # helpful) - there still are some lines with similar 
-            # descriptions, but the number of lines have already been 
-            # decreased by ~90% and can't be bothered tbh
-            if row[4] == 'Protocol unavailable.':
-                pass
-
-            else:
-                # for some ethertypes, they are presented as ="88E4" in the 
-                # csv file (this is because without the quotes: 
-                # 88E4 = 88 * 10^4 ) there are only ~20 numbers like this
-                if len(row[1]) != 4:
-                    # row[1] goes from ="88E4" to 88E4
-                    row[1] = row[1][2:-1]
-                    
-
-                # only writes columns 2 and 5, aka the ethertype and the 
-                # description of said ethertype
-                # ex: 
-                # 0806 Address Resolution Protocol - A. R. P.
-                ethertype_lookup_file.write(row[1]+' '+row[4]+'\n')
-
-
+    # see johnParser/functions/log.py
     log.log('Created: ' + write_path)
+
+def data_remover_ethertype(list_row):
+    # see functions make_ethertype_lookup and request_to_file
+
+    # if this isn't added, there would be ~3287 lines that have 'Protocol 
+    # unavailable.' as a description (which obviously isn't very helpful), this 
+    # decreases the number of lines by 90%
+    if list_row[4] == 'Protocol unavailable.':
+        # returns False to not print to file
+        return False
+
+    # for some ethertypes, they are presented as ="88E4" in the csv file 
+    # (this is because without the quotes: 88E4 = 88 * 10^4)
+    elif len(list_row[1]) != 4:
+        # list_row[1] goes from ="88E4" to '88E4'
+        list_row[1] = list_row[1][2:6]
+    
+    # list_row will start as something like:
+    # ['Registry', 'Assignment', 'Organization Name', 'Organization Address', 
+    # 'Protocol']
+    # then removes the fourth, third, and first entries to end up with:
+    # ['Assignment', 'Protocol']
+    list_row.pop(3)
+    list_row.pop(2)
+    list_row.pop(0)
+
+    # returns true to print to file
+    return True
 
 
 
@@ -176,7 +243,7 @@ def make_lookups(path):
     # this is for testing, will be removed when implemented fully.
     global PATH
     PATH = path
-    #make_mac_lookup()
+    make_mac_lookup()
     make_ethertype_lookup()
 
-#make_lookups(path.PATH)
+make_lookups(path.PATH)
