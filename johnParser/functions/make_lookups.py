@@ -32,7 +32,7 @@ def request_to_file(write_path, data_remover_function, *urls):
 
             # write a breadcrumb? back to here if anyone is curious
             lookup_file.write(
-                '# Created using johnParser/functions/makeDescriptions.py\n'
+                '# Created using johnParser/functions/make_lookups.py\n'
             )
 
             # iterate through the passed urls
@@ -56,7 +56,7 @@ def request_to_file(write_path, data_remover_function, *urls):
                 # string occupying that cell. 
                 #
                 # For example the spreadsheet row might be: 
-                # 'Assingment,"Description \n with a newline"\n'
+                # 'Assignment,"Description \n with a newline"\n'
                 # and the iter_lines() would break that into two lines instead 
                 # of one. 
                 # 
@@ -64,10 +64,10 @@ def request_to_file(write_path, data_remover_function, *urls):
                 # program has found the entire row. 
                 # 
                 # Extending this previous example, buffer would store:
-                # 'Assingment,"Description', 
+                # 'Assignment,"Description', 
                 # then the next iteration would add the rest of the row to this 
                 # buffer with the result of 
-                # 'Assingment,"Description with a newline"'
+                # 'Assignment,"Description with a newline"'
                 buffer = ''
                 
                 # makes the physical request to the url for it's data
@@ -245,5 +245,3 @@ def make_lookups(path):
     PATH = path
     make_mac_lookup()
     make_ethertype_lookup()
-
-make_lookups(path.PATH)

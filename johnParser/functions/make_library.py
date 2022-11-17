@@ -25,4 +25,3 @@ def make_library():
     create_library_folder()
     make_lookups.make_lookups(PATH)
     make_config.make_config(PATH)
-make_library()

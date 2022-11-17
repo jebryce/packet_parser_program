@@ -99,7 +99,7 @@ def EtherTypeDesc(two_octet_field):
             # ['0806', 'Address Resolution Protocol - A. R. P.\n']
             row = row.split(' ', 1)
             if two_octet_field.hex().upper() == row[0]:
-                description = row[1].replace('\n', '')
+                description = row[1].replace('\n','')
                 break
 
     return description
@@ -126,12 +126,31 @@ class PacketDesc():
         
         if Packet.tagged != False:
             self.tagged = 'Customer VLAN Tagged Type' 
-            # TODO: create vlan ID lookup
-            self.vlan_id = 'SDN Production VLAN'
+            self.vlan_id_lookup(Packet.vlan_id)
 
         # looks up ethertype value in dictionary to find description
         # ex: 'Address Resolution Protocol (ARP)' (type: string)
         self.ethertype = EtherTypeDesc(Packet.ethertype)
+    
+    def vlan_id_lookup(self, packet_vlan_id):
+        config_file = PATH+'config.txt'
+        with open(config_file, 'r',  encoding='utf-8') as config:
+            found_VLANs = False
+            for row in config:
+                if found_VLANs == False and row == 'VLANs\n':
+                    found_VLANs = True
+                elif found_VLANs == True:
+                    if row[0] == '\t':
+                        row = row.replace('\t','').split(' ', 1)
+                        if row[0].zfill(4) == packet_vlan_id.hex().upper():
+                            self.vlan_id = row[1].replace('\n', '')
+                            break
+                        elif row[0] == 'XXXX':
+                            self.vlan_id = row[1].replace('\n', '')
+                    else:
+                        break
+                    
+
         
 class arpDesc():
     def __init__(self,arp):
