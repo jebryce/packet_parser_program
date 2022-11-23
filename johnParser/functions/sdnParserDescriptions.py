@@ -86,15 +86,11 @@ class Packet_desc():
         # returns a dictionary of the same number of strings with a 
         # configurable description taken from ~/Documents/johnParser/config
         # where '~' is user
-        #
-        # NOTE: this needs to be updated, the reasoning is that it tries to 
-        # iterate over the entire file for each vlan id - and not the other way 
-        # around
-        # this doesn't work because if the 'for row in config' gets to row 50 
-        # then we break, for next vlan_id it needs to lookup, it starts from 
-        # row 51 - which is annoying so go look at the mac_address_lookup 
-        # function to see how i fixed this
 
+        # we shouldn't look up the same vlan_id twice, and since vlan_ids
+        # is default a tuple, if we change it to a set, the duplicate values 
+        # will be dropped.
+        vlan_ids = set(vlan_ids)
 
         # 'with' closes the file after we are finished with it
         config_file = PATH + 'config.txt'
@@ -105,33 +101,55 @@ class Packet_desc():
             # provided, and value = description
             vid_descs = dict()
 
+            # skip the first line of the file as it is:
+            # '# Created using johnParser/functions/make_config.py'
+            config.__next__()
+            
+
             # this was my first attempt at writing a config file
             found_VLANs = False
-            for vlan_id in vlan_ids:
-                for row in config:
-                    # so first we search for the line 'VLANS\n'
-                    if found_VLANs == False and row == 'VLANs\n':
-                        # once we have found it, latch this boolean
-                        found_VLANs = True
-                    # now start searching every line for our vlan description
-                    elif found_VLANs == True:
-                        # if the line starts with a tab, then continue
-                        if row[0] == '\t':
-                            # turn row: '\t0003 This is our vlan description!\n'
-                            # into ['0003', 'This is our vlan descrption!\n']
-                            row = row.replace('\t','').split(' ', 1)
+            for row in config:
+                # so first we search for the line 'VLANS\n'
+                if found_VLANs == False and row == 'VLANs\n':
+                    # once we have found it, latch this boolean
+                    found_VLANs = True
+                # now start searching every line for our vlan description
+                elif found_VLANs == True:
+                    # if the line starts with a tab, then continue
+                    if row[0] == '\t':
+                        # turn row: '\t0003 This is our vlan description!\n'
+                        # into ['0003', 'This is our vlan descrption!\n']
+                        row = row.replace('\t','').split(' ', 1)
+                        # 'XXXX' I implemented as a general description
+                        # it is checked first as the bytes.fromhex() function 
+                        # cannot take in 'XXXX'
+                        if row[0] == 'XXXX':
+                            # if you hit 'XXXX', then fill in remaining 
+                            # descriptions to a default
+                            for vlan_id in vlan_ids:
+                                # if key is not in the dictionary
+                                if vlan_id not in vid_descs:
+                                    # then create a key value pair
+                                    vid_descs[vlan_id] = row[1].replace('\n','')
+                        else:
                             # zfill fills in zeros from the left
                             # ex: 3 -> 0003
-                            if row[0].zfill(4) == vlan_id.hex().upper():
-                                # if we found what we were looking for, break 
-                                vid_descs[vlan_id] = row[1].replace('\n', '')
+                            row_0 = bytes.fromhex(row[0].zfill(4))
+                            # if the ethertype from the file is in the set of 
+                            # ethertypes we are requesting
+                            if row_0 in vlan_ids:
+                                vid_descs[row_0] = row[1].replace('\n','')
+                            
+                            # if we have found enough descriptions, break
+                            if len(vid_descs) == len(vlan_ids):
                                 break
-                            elif row[0] == 'XXXX':
-                                # 'XXXX' I implemented as a general description
-                                vid_descs[vlan_id] = row[1].replace('\n', '')
-                        # once we reach the end of the VLANs data, break
-                        else:
-                            break
+
+
+                        
+                    # once we reach the end of the VLANs data, break
+                    else:
+                        break
+
         return vid_descs
 
     def mac_address_lookup(self, *addresses):
@@ -173,6 +191,15 @@ class Packet_desc():
             # 'with' closes the file after we are finished with it
             mac_lookup_file = PATH + 'mac_lookup.txt'
             with open(mac_lookup_file, 'r', encoding='utf-8') as mac_lookup:
+
+                # skip the first two lines in the file, since the first two 
+                # lines are :
+                # '# Created using johnParser/functions/make_lookups.py'
+                # and
+                # 'Assignment Organization Name'
+                mac_lookup.__next__()
+                mac_lookup.__next__()
+
                 for row in mac_lookup:
                     # splits each row into a list of two values, first 
                     # value is the address block assigned, and the second 
@@ -212,8 +239,11 @@ class Packet_desc():
     def ethertype_lookup(self, *ethertypes):
         # takes in a number of 2 octet ethertypes
         # returns the same number of strings with the 
-        #
-        # NOTE: this needs to be updated, see vlan_id_lookup for reasoning
+
+        # we shouldn't look up the same ethertype twice, and since ethertypes 
+        # is default a tuple, if we change it to a set, the duplicate values 
+        # will be dropped.
+        ethertypes = set(ethertypes)
 
         # 'with' closes the file after we are finished with it
         ethertype_lookup_file = PATH + 'ethertype_lookup.txt'
@@ -224,18 +254,37 @@ class Packet_desc():
             # provided, and value = description
             ethertype_descs = dict()  
 
+            # skip the first two lines in the file, as the first two lines are:
+            # '# Created using johnParser/functions/make_lookups.py'
+            # and
+            # 'sign Protocol' 
+            # (sign is Assignment, just cut off bc didn't care to change how I 
+            # create the file)
+            ethertype_lookup.__next__()
+            ethertype_lookup.__next__()
 
-            for ethertype in ethertypes:
-                ethertype_descs[ethertype] = 'Protocol unavailable.'
-                for row in ethertype_lookup:
-                    # splits each row into a list of two values, first value is
-                    # the ethertype, and the second vlaue is the description
-                    # ex: (type: list)
-                    # ['0806', 'Address Resolution Protocol - A. R. P.\n']
-                    row = row.split(' ', 1)
-                    if ethertype.hex().upper() == row[0]:
-                        ethertype_descs[ethertype] = row[1].replace('\n','')
-                        break
+
+            for row in ethertype_lookup:
+                # splits each row into a list of two values, first value is
+                # the ethertype, and the second vlaue is the description
+                # ex: (type: list)
+                # ['0806', 'Address Resolution Protocol - A. R. P.\n']
+                row = row.split(' ', 1)
+                row_0 = bytes.fromhex(row[0])
+                if row_0 in ethertypes:
+                    ethertype_descs[row_0] = row[1].replace('\n','')
+                
+                # if we have found enough descriptions, break
+                elif len(ethertypes) == len(ethertype_descs):
+                    break
+            # if we went through the file and haven't found enough descriptions
+            if len(ethertypes) != len(ethertype_descs):
+                for ethertype in ethertypes:
+                    # if an ethertype doesn't have a description
+                    if ethertype not in ethertype_descs:
+                        # then set it to this default.
+                        ethertype_descs[ethertype] = 'Protocol unavailable.'
+
 
         return ethertype_descs
                     
