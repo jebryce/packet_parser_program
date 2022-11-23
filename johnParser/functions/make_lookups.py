@@ -190,7 +190,6 @@ def data_remover_mac(list_row):
     # returns true to print to file
     return True
 
-
 def make_ethertype_lookup():
     # (re)generates a file that contains ethertypes and their descriptions
 
@@ -237,7 +236,59 @@ def data_remover_ethertype(list_row):
     # returns true to print to file
     return True
 
+def make_arp_opcode_lookup():
+    # (re)generates a file that contains ethertypes and their descriptions
 
+    # Where the mac address lookup table will be located
+    write_path = PATH + 'arp_opcode_lookup.txt'
+
+    # see johnParser/functions/log.py
+    log.log('Creating: ' + write_path)
+
+    # csv file we will download to get the ethertypes with descriptions
+    url = 'https://www.iana.org/assignments/arp-parameters/arp-parameters-1.csv'
+
+    # see the function request_to_file for more info
+    request_to_file(write_path,data_remover_arp_opcode,url)
+    
+    # see johnParser/functions/log.py
+    log.log('Created: ' + write_path)
+
+
+def data_remover_arp_opcode(list_row):
+    # remove the third entry
+    list_row.pop(2)
+    # will go from:
+    # ['Number', 'Operation Code (op)', 'References']
+    # to:
+    # ['Number', 'Operation Code (op)']
+
+def make_arp_hardware_lookup():
+    # (re)generates a file that contains ethertypes and their descriptions
+
+    # Where the mac address lookup table will be located
+    write_path = PATH + 'arp_hardware_lookup.txt'
+
+    # see johnParser/functions/log.py
+    log.log('Creating: ' + write_path)
+
+    # csv file we will download to get the ethertypes with descriptions
+    url = 'https://www.iana.org/assignments/arp-parameters/arp-parameters-2.csv'
+
+    # see the function request_to_file for more info
+    request_to_file(write_path,data_remover_arp_hardware,url)
+    
+    # see johnParser/functions/log.py
+    log.log('Created: ' + write_path)
+
+
+def data_remover_arp_hardware(list_row):
+    # remove the third entry
+    list_row.pop(2)
+    # will go from:
+    # ['Number', 'Hardware Type (hrd)', 'Reference']
+    # to
+    # ['Number', 'Hardware Type (hrd)']
 
 def make_lookups(path):
     # this is for testing, will be removed when implemented fully.
@@ -245,3 +296,5 @@ def make_lookups(path):
     PATH = path
     make_mac_lookup()
     make_ethertype_lookup()
+    make_arp_opcode_lookup()
+    make_arp_hardware_lookup()

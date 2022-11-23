@@ -24,4 +24,4 @@ def make_library():
     # for testing atm
     create_library_folder()
     make_lookups.make_lookups(PATH)
-    make_config.make_config(PATH)
+    #make_config.make_config(PATH)
