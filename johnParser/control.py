@@ -14,7 +14,8 @@
 from johnParser.functions import printPKTinfo
 from johnParser.functions import sdnParser
 from johnParser.functions import make_library
-make_library.make_library()
+import os
+#make_library.make_library()
 
 
 
@@ -24,7 +25,7 @@ hex_packets = open('johnParser/library/hexdata.txt','r').readlines()
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
 for hex_string in hex_packets:
-    # os.system('clear')
+    #os.system('cls')
     
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
@@ -41,9 +42,10 @@ for hex_string in hex_packets:
     # print(psutil.Process().memory_info().rss / (1024*1024))
 
     # hexdump.hexdump(Packet.packet)
+
     
-    
-    break
+    if Packet.ethertype.hex() == '0800':
+        break
     
 
 

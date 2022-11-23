@@ -59,59 +59,63 @@ class Packet:
         # ex: 0806 (type: bytes)
         self.ethertype = partialPacket[0:2]
 
+        self.partial_packet = partialPacket[2:]
+
 
         # I couldn't think of a better way to do this (that was as readable)
         # this creates a new class object that then parsers the rest of the 
         # packet. If nothing is found, the variables 
         # self.ethertype and self.ethertype_desc (should) always have values  
+        self.desc = sdnParserDescriptions.Packet_desc(self)
         if self.ethertype.hex() == '0806':
-            self.arp = arp(partialPacket[2:])
+            self.Arp = Arp(self)
         elif self.ethertype.hex() == '0800':
             pass
             # self.ipv4 = ipv4(partialPacket[2:])
-
         # see sdnParserDescriptions for more detail, but it creates 
         # descriptions for a self.variable at self.desc.variable 
-        self.desc = sdnParserDescriptions.PacketDesc(self)
+        self.desc.finish_descriptions(self)
 
 
 
-class arp:
-    def __init__(self, arp_packet):
+
+
+class Arp:
+    def __init__(self, Packet):
         # Decided to chop off the front of the packet as tagged traffic would 
         # have different index values
 
         # ex: 0001 (type: bytes)
-        self.hardware_type = arp_packet[0:2]
+        self.hardware_type = Packet.partial_packet[0:2]
 
         # this shares the same EtherType numbers/descriptions
         # ex: 0800 (type: bytes)
-        self.protocol_type = arp_packet[2:4]
+        self.protocol_type = Packet.partial_packet[2:4]
 
         # index [4:5] returns a bytes object, index[5] returns an integer
         # ex: 06 (type: bytes)
-        self.hardware_size = arp_packet[4:5]
+        self.hardware_size = Packet.partial_packet[4:5]
 
         # ex: 04 (type: bytes)
-        self.protocol_size = arp_packet[5:6]
+        self.protocol_size = Packet.partial_packet[5:6]
 
         # ex: 0001 (type: bytes)
-        self.opcode = arp_packet[6:8]
+        self.opcode = Packet.partial_packet[6:8]
 
         # ex: B8 27 EB 3C 2D 60 (type: bytes)
-        self.sender_mac_address = arp_packet[8:14]
+        self.sender_mac_address = Packet.partial_packet[8:14]
 
         # ex: A9 FE B2 34 (type: bytes)
-        self.sender_ip_address = arp_packet[14:18]
+        self.sender_ip_address = Packet.partial_packet[14:18]
 
         # ex: 00 00 00 00 00 00 (type: bytes)
-        self.target_mac_address = arp_packet[18:24]
+        self.target_mac_address = Packet.partial_packet[18:24]
 
         # ex: 80 AB 01 01 (type: bytes)     
-        self.target_ip_address = arp_packet[24:28]
+        self.target_ip_address = Packet.partial_packet[24:28]
 
-        self.desc = sdnParserDescriptions.arpDesc(self)
+        self.desc = sdnParserDescriptions.Arp_desc(self, Packet)
 
 
-class ipv4:
+class Ipv4:
     pass

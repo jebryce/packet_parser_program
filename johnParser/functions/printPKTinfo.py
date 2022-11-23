@@ -230,11 +230,11 @@ class print_arp_info(print_packet_info):
         # ARP Target | 00:00:00:00:00:00 | Target not yet known
         parent.print_mac_address_table(
             'ARP Sender',
-            parent.Packet.arp.sender_mac_address,
-            parent.Packet.arp.desc.sender_mac_address,
+            parent.Packet.Arp.sender_mac_address,
+            parent.Packet.Arp.desc.sender_mac_address,
             'ARP Target',
-            parent.Packet.arp.target_mac_address,
-            parent.Packet.arp.desc.target_mac_address
+            parent.Packet.Arp.target_mac_address,
+            parent.Packet.Arp.desc.target_mac_address
         )
 
         # ex:
@@ -245,11 +245,11 @@ class print_arp_info(print_packet_info):
         #  ARP Target |    128.171.1.1    | placeholder for IP lookup 
         parent.print_ipv4_address_table(
             'ARP Sender',
-            parent.Packet.arp.sender_ip_address,
-            parent.Packet.arp.desc.sender_ip_address,
+            parent.Packet.Arp.sender_ip_address,
+            parent.Packet.Arp.desc.sender_ip_address,
             'ARP Target',
-            parent.Packet.arp.target_ip_address,
-            parent.Packet.arp.desc.target_ip_address, 
+            parent.Packet.Arp.target_ip_address,
+            parent.Packet.Arp.desc.target_ip_address, 
         )
 
     def print_arp_data(self,parent):
@@ -262,8 +262,8 @@ class print_arp_info(print_packet_info):
             column_widths = self.arp_widths,
             entries = [
                 'Hardware Type',
-                parent.Packet.arp.hardware_type.hex().upper().lstrip('0'), 
-                parent.Packet.arp.desc.hardware_type
+                parent.Packet.Arp.hardware_type.hex().upper().lstrip('0'), 
+                parent.Packet.Arp.desc.hardware_type
             ],
             arrow_length = 3
         )
@@ -272,8 +272,8 @@ class print_arp_info(print_packet_info):
             column_widths = self.arp_widths,
             entries = [
                 'Protocol Type',
-                parent.Packet.arp.protocol_type.hex().upper(), 
-                parent.Packet.arp.desc.protocol_type
+                parent.Packet.Arp.protocol_type.hex().upper(), 
+                parent.Packet.Arp.desc.protocol_type
             ],
             arrow_length = 3
         )
@@ -282,8 +282,8 @@ class print_arp_info(print_packet_info):
             column_widths = self.arp_widths,
             entries = [
                 'Hardware Size',
-                parent.Packet.arp.hardware_size.hex().upper().lstrip('0'), 
-                parent.Packet.arp.desc.hardware_size
+                parent.Packet.Arp.hardware_size.hex().upper().lstrip('0'), 
+                parent.Packet.Arp.desc.hardware_size
             ],
             arrow_length = 3
         )
@@ -292,8 +292,8 @@ class print_arp_info(print_packet_info):
             column_widths = self.arp_widths,
             entries = [
                 'Protocol Size',
-                parent.Packet.arp.protocol_size.hex().upper().lstrip('0'), 
-                parent.Packet.arp.desc.protocol_size
+                parent.Packet.Arp.protocol_size.hex().upper().lstrip('0'), 
+                parent.Packet.Arp.desc.protocol_size
             ],
             arrow_length = 3
         )
@@ -302,8 +302,8 @@ class print_arp_info(print_packet_info):
             column_widths = self.arp_widths,
             entries = [
                 'Opcode',
-                parent.Packet.arp.opcode.hex().upper().lstrip('0'), 
-                parent.Packet.arp.desc.opcode
+                parent.Packet.Arp.opcode.hex().upper().lstrip('0'), 
+                parent.Packet.Arp.desc.opcode
             ],
             arrow_length = 3
         )
