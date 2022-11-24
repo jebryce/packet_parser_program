@@ -80,7 +80,6 @@ class Packet_desc():
             self.ethertype = \
                 self.ethertype_lookup(Packet.ethertype)[Packet.ethertype]
 
-
     def vlan_id_lookup(self, *vlan_ids):
         # takes in a number of 2 octet vlan_ids
         # returns a dictionary of the same number of strings with a 
@@ -246,9 +245,8 @@ class Packet_desc():
         ethertypes = set(ethertypes)
 
         # 'with' closes the file after we are finished with it
-        ethertype_lookup_file = PATH + 'ethertype_lookup.txt'
-        with open(ethertype_lookup_file, 'r', encoding='utf-8') as \
-            ethertype_lookup:
+        ethertype_file = PATH + 'ethertype_lookup.txt'
+        with open(ethertype_file, 'r', encoding='utf-8') as ethertype_lookup:
 
             # arg_desc_dict will be returned, will be key = X.desc.X variable 
             # provided, and value = description
@@ -288,15 +286,14 @@ class Packet_desc():
 
         return ethertype_descs
                     
-
         
 class Arp_desc():
     def __init__(self,Arp,Packet):
-        # TODO import IANA spreadsheet for hardware type
-        self.hardware_type = 'placeholder for hardware_type lookup'
+        # lookup hardware type description
+        self.hardware_type = self.hardware_type_lookup(Arp.hardware_type)
 
         # this shares the same EtherType numbers/descriptions
-        # so lookup all ethertypes
+        # so lookup all ethertype descriptions
         ethertypes = Packet.desc.ethertype_lookup(
             Arp.protocol_type,
             Packet.ethertype
@@ -309,17 +306,17 @@ class Arp_desc():
 
         self.protocol_size = 'Length of the network protocol (IPv4) address.'
 
-        # TODO import IANA spreadsheet for opcode
-        self.opcode = 'placeholder for opcode lookup'
+        # lookup opcode description
+        self.opcode = self.opcode_lookup(Arp.opcode)
 
-        # lookup mac addresses
+        # lookup mac addresses vendor ids
         mac_addresses = Packet.desc.mac_address_lookup(
             Packet.source_mac_address,
             Packet.destination_mac_address,
             Arp.sender_mac_address,
             Arp.target_mac_address
         )
-        # then assign then to the correct variables
+        # then assign them to the correct variables
         Packet.desc.source_mac_address = \
             mac_addresses[Packet.source_mac_address]
         Packet.desc.destination_mac_address = \
@@ -333,3 +330,43 @@ class Arp_desc():
         self.sender_ip_address = 'placeholder for IP lookup'
         self.target_ip_address = 'placeholder for IP lookup'
 
+    
+    def opcode_lookup(self, opcode):
+        # takes in an arp opcode, returns it's description
+
+        # 'with' statement closes the file after we are finished with it
+        opcode_file = PATH + 'arp_opcode_lookup.txt'
+        with open(opcode_file, 'r', encoding='utf-8') as opcode_lookup:
+            # skip the first two lines as they are:
+            # '# Created using johnParser/functions/make_lookups.py'
+            # and
+            # 'Number Operation Code (op)'
+            opcode_lookup.__next__()
+            opcode_lookup.__next__()
+            
+            # default description
+            opcode_desc = 'Unassigned'
+
+            # we look through the file and try to reassign the variable
+            for row in opcode_lookup:
+                # splits each row into a list of two values, first value is
+                # the opcode, and the second vlaue is the description
+                # ex: (type: list) ['1', 'REQUEST\n']
+                row = row.split(' ', 1)
+                if int.from_bytes(opcode,'big') == int(row[0]):
+                    opcode_desc = row[1].replace('\n', '').capitalize()
+        return opcode_desc
+
+        
+    
+    def hardware_type_lookup(self, hardware_type):
+        hardware_type_file = PATH + 'arp_hardware_lookup.txt'
+        with open(hardware_type_file, 'r', encoding='utf-8') as hardware_lookup:
+            hardware_lookup.__next__()
+            hardware_lookup.__next__()
+            hardware_desc = 'Unassigned'
+            for row in hardware_lookup:
+                row = row.split(' ',1)
+                if int.from_bytes(hardware_type,'big') == int(row[0]):
+                    hardware_desc = row[1].replace('\n', '')
+        return hardware_desc
