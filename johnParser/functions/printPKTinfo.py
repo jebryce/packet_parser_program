@@ -4,7 +4,7 @@
 # 
 # This file contains classes that print the parsed data. 
 # 
-from johnParser.functions import print_functions
+from johnParser.functions import print_functions, john_hexdump
 
 class print_packet_info():
     def __init__(
@@ -41,6 +41,18 @@ class print_packet_info():
         # I did this as it is easier to size the columns minimally
         if Packet.ethertype.hex() == '0806':
             print_arp_info(self)
+
+        # 139 is the length of a line in the hexdump if 32 bytes per line
+        if bar_length >= 139:
+            bytes_per_line = 32
+        elif bar_length >= 73:
+            bytes_per_line = 16
+        else:
+            bytes_per_line = 8
+
+        hexdump = john_hexdump.john_hexdump(self.Packet.packet, bytes_per_line)
+        self.pf.print_bar()
+        self.pf.optional_print(hexdump)
         
     def print_mac_address_table(
        self, source_title, source_mac, source_mac_desc,

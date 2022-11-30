@@ -182,17 +182,6 @@ class print_functions():
                     second_column_width = column_widths[1],
                     third_entry = string
                 ))
-        #
 
-
-
-# pf = print_functions()
-# pf.print_bar()
-# widths = [20,17]
-# ents = ['Destination','FF.FF.FF.FF.FF.FF','Broadcast, but thsis is super long to test out the wrap line function, tbh and holy crud his ofirst part wasnt long enoiuguh either to fully test  iahsdfhi jasdfhj aksjdhf kjahsdf kjhasdfkj hashkjdf kjahsdfk jhasdkf jhaskjd fhaksdjhf kasdhf kjahsdf kjhasfk jhaskdjf haksjdhf kajsdhfkajnbrsjhbeqrjha sbdsjhb ajshebr ugyaesbruy gabajdhfkajdhsfkjhasdomgthiswasntevenclosetobeinglongenoughwtfhowmanycharactersis150characetsjesuswellthissurelyis150charactersnowfhjkaskdhjfhjkathisistotestoutthehyphenatefunction!!!!!!!!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ']
-# ents2 = ['VLAN ID', '3','SDN Production']
-# pf.print_data_bar(column_widths=widths)
-# pf.print_data(column_widths=widths,entries=ents)
-# pf.print_data(column_widths=widths,entries=ents,arrow_length = 3)
 
 
