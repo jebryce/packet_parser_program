@@ -19,9 +19,9 @@
 #                                      | ex: 0806 (type: bytes)
 # my_Packet.desc.ethertype             | returns a string that describes
 #                                      | ex: 'Address Resolution Protocol (ARP)'
-# my_Packet.arp.opcode                 | returns a bytes object
+# my_Packet.ARP.opcode                 | returns a bytes object
 #                                      | ex: 01 (type: bytes)
-# my_Packet.arp.desc.opcode            | returns a string that describes
+# my_Packet.ARP.desc.opcode            | returns a string that describes
 #                                      | ex: 'Request' (type: string)
 # generally:                           |
 # my_Packet.variable                   | calls the data of variable
@@ -68,9 +68,9 @@ class Packet:
         # self.ethertype and self.ethertype_desc (should) always have values  
         self.desc = sdnParserDescriptions.Packet_desc(self)
         if self.ethertype.hex() == '0806':
-            self.Arp = Arp(self)
+            self.ARP = ARP(self)
         elif self.ethertype.hex() == '0800':
-            pass
+            self.IPv4 = IPv4(self)
             # self.ipv4 = ipv4(partialPacket[2:])
         # see sdnParserDescriptions for more detail, but it creates 
         # descriptions for a self.variable at self.desc.variable 
@@ -80,7 +80,7 @@ class Packet:
 
 
 
-class Arp:
+class ARP:
     def __init__(self, Packet):
         # Decided to chop off the front of the packet as tagged traffic would 
         # have different index values
@@ -114,8 +114,42 @@ class Arp:
         # ex: 80 AB 01 01 (type: bytes)     
         self.target_ip_address = Packet.partial_packet[24:28]
 
-        self.desc = sdnParserDescriptions.Arp_desc(self, Packet)
+        self.desc = sdnParserDescriptions.ARP_desc(self, Packet)
 
 
-class Ipv4:
-    pass
+class IPv4:
+    def __init__(self, Packet):
+        self.version = (Packet.partial_packet[0] >> 4).to_bytes(1,'big')
+        self.ihl = (Packet.partial_packet[0] & 0b1111).to_bytes(1,'big')
+        self.dscp = (Packet.partial_packet[1] >> 2).to_bytes(2,'big')
+        self.ecn = (Packet.partial_packet[1] & 0b11).to_bytes(1,'big')
+
+        self.total_length = Packet.partial_packet[2:4]
+        self.identification = Packet.partial_packet[4:6]
+
+        self.flags = (Packet.partial_packet[6] >> 5).to_bytes(1,'big')
+
+        self.fragment_offset = Packet.partial_packet[6] & 0b11111 * 256
+        self.fragment_offset += Packet.partial_packet[7]
+        self.fragment_offset = self.fragment_offset.to_bytes(1,'big')
+
+
+
+        self.ttl = Packet.partial_packet[8:9]
+        self.protocol = Packet.partial_packet[9:10]
+        self.checksum = Packet.partial_packet[10:12]
+        self.source_ip_address = Packet.partial_packet[12:16]
+        self.destination_ip_address = Packet.partial_packet[16:20]
+
+        self.partial_packet = Packet.partial_packet[20:]
+        if self.protocol.hex() == '01':
+            self.ICMP = ICMP(self)
+
+class ICMP:
+    def __init__(self, IPv4):
+        self.type = IPv4.partial_packet[0:1]
+        self.code = IPv4.partial_packet[1:2]
+        self.checksum = IPv4.partial_packet[2:4]
+        self.identifier = IPv4.partial_packet[4:6]
+        self.sequence_number = IPv4.partial_packet[6:8]
+

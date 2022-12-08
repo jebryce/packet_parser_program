@@ -40,7 +40,9 @@ class print_packet_info():
         # then allow the subclasses to print everything else
         # I did this as it is easier to size the columns minimally
         if Packet.ethertype.hex() == '0806':
-            print_arp_info(self)
+            print_ARP_info(self)
+        elif Packet.ethertype.hex() == '0800':
+            print_IPv4_info(self)
 
         # 139 is the length of a line in the hexdump if 32 bytes per line
         if bar_length >= 139:
@@ -69,9 +71,7 @@ class print_packet_info():
         #      Source | B8:27:EB:3C:2D:60 | Raspberry Pi Foundation 
         # Destination | FF:FF:FF:FF:FF:FF | Broadcast 
 
-        # Auto fit first column's length to longest title
-        title_length = max(len(source_title),len(dest_title))
-        mac_widths = [title_length, 17]
+        mac_widths = [11, 17]
 
         # Print the table as shown above, each self.pf.print_x call prints a row
         # print mac address column headers
@@ -118,9 +118,7 @@ class print_packet_info():
         #  ARP Sender |  169.254.178.52   | placeholder for IP lookup 
         #  ARP Target |    128.171.1.1    | placeholder for IP lookup 
         
-        # Auto fit first column's length to longest title
-        title_length = max(len(source_title),len(dest_title))
-        ipv4_widths = [title_length, 17]
+        ipv4_widths = [11, 17]
 
         # Honestly am surprised this worked
         # this is convert a 4-octet ipv4 address (in type bytes)
@@ -160,7 +158,7 @@ class print_packet_info():
             just = '^'
         )
 
-    def print_ethertype(self, column_widths, ethertype_abbreviation):
+    def print_ethertype(self, ethertype_abbreviation):
         # from the example below, column_widths is a list of two integers that 
         # determine the widths of the first two columns. In this example it is 
         # [9, 22] (type: list of two integers)
@@ -178,19 +176,19 @@ class print_packet_info():
         # Print EtherType column headers
         self.pf.print_bar()
         self.pf.print_data(
-            column_widths=column_widths,
-            entries=['EtherType', 'Value (hex)', 'Description']
+            column_widths=self.widths,
+            entries=['Protocol', 'Value (hex)', 'Description']
         )
-        self.pf.print_data_bar(column_widths = column_widths)
+        self.pf.print_data_bar(column_widths = self.widths)
 
         # Print if tagged traffic
         if self.Packet.tagged != False:
             self.pf.print_data(
-                column_widths = column_widths,
+                column_widths = self.widths,
                 entries = ['802.1Q', '8100', self.Packet.desc.tagged]
             )
             self.pf.print_data(
-                column_widths = column_widths,
+                column_widths = self.widths,
                 entries = [
                     'VLAN ID', 
                     self.Packet.vlan_id.hex().upper(),
@@ -198,11 +196,11 @@ class print_packet_info():
                 ],
                 arrow_length = 3
             )
-            self.pf.print_data_bar(column_widths = column_widths)
+            self.pf.print_data_bar(column_widths = self.widths)
 
         # print the ethertype of the packet
         self.pf.print_data(
-            column_widths = column_widths,
+            column_widths = self.widths,
             entries = [
                 ethertype_abbreviation,
                 self.Packet.ethertype.hex().upper(), 
@@ -210,29 +208,11 @@ class print_packet_info():
                 ]
         )
         
-class print_arp_info(print_packet_info):
+class print_ARP_info(print_packet_info):
     def __init__(self, parent):
         # widths of the first 2 columns 
-        self.arp_widths = [9, 22]
+        parent.widths = (8, 22)
         # then we just print the data of the packet
-
-        # ex:
-        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        #  EtherType | Value (hex)            | Description 
-        # -----------+------------------------+---------------------------------
-        #     802.1Q | 8100                   | Customer VLAN Tagged Type 
-        #            |--> VLAN ID: 0003       | SDN Production VLAN 
-        # -----------+------------------------+---------------------------------
-        #        ARP | 0806                   | Address Resolution Protocol
-        parent.print_ethertype(self.arp_widths,'ARP')
-
-        # ex: (note descriptions were cut off)
-        #            |--> Hardware Type: 1    | placeholder for lookup
-        #            |--> Protocol Type: 0800 | IPv4 
-        #            |--> Hardware Size: 6    | Length of the hardware address
-        #            |--> Protocol Size: 4    | Length of the protocol address
-        #            |--> Opcode: 1           | placeholder for opcode lookup 
-        self.print_arp_data(parent)
 
         # ex: 
         #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -242,11 +222,11 @@ class print_arp_info(print_packet_info):
         # ARP Target | 00:00:00:00:00:00 | Target not yet known
         parent.print_mac_address_table(
             'ARP Sender',
-            parent.Packet.Arp.sender_mac_address,
-            parent.Packet.Arp.desc.sender_mac_address,
+            parent.Packet.ARP.sender_mac_address,
+            parent.Packet.ARP.desc.sender_mac_address,
             'ARP Target',
-            parent.Packet.Arp.target_mac_address,
-            parent.Packet.Arp.desc.target_mac_address
+            parent.Packet.ARP.target_mac_address,
+            parent.Packet.ARP.desc.target_mac_address
         )
 
         # ex:
@@ -257,70 +237,270 @@ class print_arp_info(print_packet_info):
         #  ARP Target |    128.171.1.1    | placeholder for IP lookup 
         parent.print_ipv4_address_table(
             'ARP Sender',
-            parent.Packet.Arp.sender_ip_address,
-            parent.Packet.Arp.desc.sender_ip_address,
+            parent.Packet.ARP.sender_ip_address,
+            parent.Packet.ARP.desc.sender_ip_address,
             'ARP Target',
-            parent.Packet.Arp.target_ip_address,
-            parent.Packet.Arp.desc.target_ip_address, 
+            parent.Packet.ARP.target_ip_address,
+            parent.Packet.ARP.desc.target_ip_address, 
         )
 
-    def print_arp_data(self,parent):
-        # this goes through and prints each line of data associated with an arp 
+        # ex:
+        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #  EtherType | Value (hex)            | Description 
+        # -----------+------------------------+---------------------------------
+        #     802.1Q | 8100                   | Customer VLAN Tagged Type 
+        #            |--> VLAN ID: 0003       | SDN Production VLAN 
+        # -----------+------------------------+---------------------------------
+        #        ARP | 0806                   | Address Resolution Protocol
+        parent.print_ethertype('ARP')
+
+        # ex: (note descriptions were cut off)
+        #            |--> Hardware Type: 1    | placeholder for lookup
+        #            |--> Protocol Type: 0800 | IPv4 
+        #            |--> Hardware Size: 6    | Length of the hardware address
+        #            |--> Protocol Size: 4    | Length of the protocol address
+        #            |--> Opcode: 1           | placeholder for opcode lookup 
+        self.print_ARP_data(parent)
+
+
+    def print_ARP_data(self, parent):
+        # this goes through and prints each line of data associated with an ARP 
         # packet. I decided to make this a seperate function as to make the 
         # flow of the printing more clear.
 
         # print hardware type
         parent.pf.print_data( 
-            column_widths = self.arp_widths,
+            column_widths = parent.widths,
             entries = [
                 'Hardware Type',
-                parent.Packet.Arp.hardware_type.hex().upper().lstrip('0'), 
-                parent.Packet.Arp.desc.hardware_type
+                parent.Packet.ARP.hardware_type.hex().upper(), 
+                parent.Packet.ARP.desc.hardware_type
             ],
             arrow_length = 3
         )
         # print protocol type
         parent.pf.print_data( 
-            column_widths = self.arp_widths,
+            column_widths = parent.widths,
             entries = [
                 'Protocol Type',
-                parent.Packet.Arp.protocol_type.hex().upper(), 
-                parent.Packet.Arp.desc.protocol_type
+                parent.Packet.ARP.protocol_type.hex().upper(), 
+                parent.Packet.ARP.desc.protocol_type
             ],
             arrow_length = 3
         )
         # print hardware size
         parent.pf.print_data( 
-            column_widths = self.arp_widths,
+            column_widths = parent.widths,
             entries = [
                 'Hardware Size',
-                parent.Packet.Arp.hardware_size.hex().upper().lstrip('0'), 
-                parent.Packet.Arp.desc.hardware_size
+                parent.Packet.ARP.hardware_size.hex().upper(), 
+                parent.Packet.ARP.desc.hardware_size
             ],
             arrow_length = 3
         )
         # print protocol size
         parent.pf.print_data( 
-            column_widths = self.arp_widths,
+            column_widths = parent.widths,
             entries = [
                 'Protocol Size',
-                parent.Packet.Arp.protocol_size.hex().upper().lstrip('0'), 
-                parent.Packet.Arp.desc.protocol_size
+                parent.Packet.ARP.protocol_size.hex().upper(), 
+                parent.Packet.ARP.desc.protocol_size
             ],
             arrow_length = 3
         )
         # print opcode
         parent.pf.print_data( 
-            column_widths = self.arp_widths,
+            column_widths = parent.widths,
             entries = [
                 'Opcode',
-                parent.Packet.Arp.opcode.hex().upper().lstrip('0'), 
-                parent.Packet.Arp.desc.opcode
+                parent.Packet.ARP.opcode.hex().upper(), 
+                parent.Packet.ARP.desc.opcode
             ],
             arrow_length = 3
         )
 
+class print_IPv4_info(print_packet_info):
+    def __init__(self, parent):
+        # widths of the first 2 columns 
+        parent.widths = (8, 24)
+
+        parent.print_ipv4_address_table(
+            'Source',
+            parent.Packet.IPv4.source_ip_address,
+            '',
+            'Destination',
+            parent.Packet.IPv4.destination_ip_address,
+            ''
+        )
+
+        parent.print_ethertype('IPv4')
+
+        self.print_ipv4_data(parent)
+
+        if parent.Packet.IPv4.protocol.hex() == '01':
+            print_ICMP_info(parent)
+
+        
 
 
+
+
+    def print_ipv4_data(self, parent):
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Version',
+                parent.Packet.IPv4.version.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Header Length',
+                parent.Packet.IPv4.ihl.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'DSCP',
+                parent.Packet.IPv4.dscp.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'ECN',
+                parent.Packet.IPv4.ecn.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Total Length',
+                parent.Packet.IPv4.total_length.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Identification',
+                parent.Packet.IPv4.identification.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Flags',
+                parent.Packet.IPv4.flags.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Fragment Offset',
+                parent.Packet.IPv4.fragment_offset.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Time to Live',
+                parent.Packet.IPv4.ttl.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Protocol',
+                parent.Packet.IPv4.protocol.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Checksum',
+                parent.Packet.IPv4.checksum.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+
+class print_ICMP_info(print_packet_info):
+    def __init__(self, parent):  
+        parent.pf.print_data_bar(parent.widths)
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'ICMP',
+                '', 
+                'Internet Control Message Protocol'
+            ]
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Type',
+                parent.Packet.IPv4.ICMP.type.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Code',
+                parent.Packet.IPv4.ICMP.code.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Checksum',
+                parent.Packet.IPv4.ICMP.checksum.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Identifier',
+                parent.Packet.IPv4.ICMP.identifier.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Sequence Number',
+                parent.Packet.IPv4.ICMP.sequence_number.hex().upper(), 
+                ''
+            ],
+            arrow_length = 3
+        )
 
 

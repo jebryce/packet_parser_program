@@ -96,6 +96,12 @@ class print_functions():
         data_format = ' {first_entry:>{first_column_width}} |{arrow}' + \
             ' {second_entry:{just}{second_column_width}} | {third_entry} '
 
+        # cutoff is how many characters wide the third column is
+        # the int 8 represents the spaces and '|' characters used in the 
+        # data_format string
+        cutoff = self.bar_length - 8 - sum(column_widths)
+
+        second_column_width = column_widths[1]
 
         # if arrow length is passed, creates the arrow and combines entries 1 
         # and 2 into the second column. 
@@ -106,24 +112,34 @@ class print_functions():
         elif arrow_length > 0:
             # ex: '----->'
             arrow = (arrow_length-1)*'-' + '>'
+            
+            # arrow length is subtracted from column_widths for (imo) easier 
+            # use for the programmer - it keeps the second column the same 
+            # total width with or without the arrow
+            second_column_width -= arrow_length
+
+            gap_size = len(entries[0]) + len(entries[1]) + arrow_length
+            gap_size = column_widths[1] - gap_size - 2
+            gap_size_mult = gap_size // 2
+
+            if gap_size % 2 == 1:
+                gap = ' '
+            else:
+                gap = ''
+            gap += '. '*gap_size_mult
+
 
             # imo, instead of printing:
-            # ex: '              VLAN ID |--> 3              | SDN Production'
+            # ex: '              VLAN ID |--> 03             | SDN Production'
             # it looks better to print: 
-            # ex: '                      |--> VLAN ID: 3     | SDN Production'
-            entries[1] = entries[0]+': '+entries[1]
+            # ex: '                      |--> VLAN ID:  . 03 | SDN Production'
+            entries[1] = entries[0]+': '+gap+entries[1]
             entries[0] = ''
 
 
-        # cutoff is how many characters wide the third column is
-        # the int 8 represents the spaces and '|' characters used in the 
-        # data_format string
-        cutoff = self.bar_length - 8 - sum(column_widths)
 
-        # arrow length is subtracted from column_widths for (imo) easier use 
-        # for the programmer - it keeps the second column the same total width 
-        # with or without the arrow
-        second_column_width = column_widths[1] - arrow_length
+
+        
 
         
         # if the data of the third column fits in the width provided, then 

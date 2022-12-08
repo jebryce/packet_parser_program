@@ -25,8 +25,8 @@ hex_packets = open('johnParser/library/hexdata.txt','r').readlines()
 
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
-for hex_string in hex_packets[3:]:
-    # os.system('cls')
+for hex_string in hex_packets:
+    os.system('cls')
 
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
@@ -34,7 +34,6 @@ for hex_string in hex_packets[3:]:
 
     # create an object with the packet's information parsed
     Packet = sdnParser.Packet(pkt)
-    
 
     # print the objects information to console
     printPKTinfo.print_packet_info(Packet)
@@ -42,7 +41,8 @@ for hex_string in hex_packets[3:]:
     # to make sure I am deleting large description dictionaries
     # print(psutil.Process().memory_info().rss / (1024*1024))
 
-    break
+    input('Press enter to view the next packet.')
+
 
 
 

@@ -14,9 +14,9 @@
 #                                      | ex: 0806 (type: bytes)
 # my_Packet.desc.ethertype             | returns a string that describes
 #                                      | ex: 'Address Resolution Protocol (ARP)'
-# my_Packet.arp.opcode                 | returns a bytes object
+# my_Packet.ARP.opcode                 | returns a bytes object
 #                                      | ex: 01 (type: bytes)
-# my_Packet.arp.desc.opcode            | returns a string that describes
+# my_Packet.ARP.desc.opcode            | returns a string that describes
 #                                      | ex: 'Request' (type: string)
 # generally:                           |
 # my_Packet.variable                   | calls the data of variable
@@ -35,7 +35,7 @@ class Packet_desc():
 
         # initialize all Ethernet frame variables to be None.
         # this is done so that if a ethertype description needs to open a file 
-        # for say, ARP sender/target mac addresses, then the arp description 
+        # for say, ARP sender/target mac addresses, then the ARP description 
         # class can open the file once and receive all four mac addresses, (ARP 
         # sender, ARP target, ethernet source, and ethernet destination) 
         # instead of opening the file twice and receive each pair indiviudally
@@ -287,19 +287,19 @@ class Packet_desc():
         return ethertype_descs
                     
         
-class Arp_desc():
-    def __init__(self,Arp,Packet):
+class ARP_desc():
+    def __init__(self,ARP,Packet):
         # lookup hardware type description
-        self.hardware_type = self.hardware_type_lookup(Arp.hardware_type)
+        self.hardware_type = self.hardware_type_lookup(ARP.hardware_type)
 
         # this shares the same EtherType numbers/descriptions
         # so lookup all ethertype descriptions
         ethertypes = Packet.desc.ethertype_lookup(
-            Arp.protocol_type,
+            ARP.protocol_type,
             Packet.ethertype
         )
         # then assign them to the correct variables
-        self.protocol_type = ethertypes[Arp.protocol_type]
+        self.protocol_type = ethertypes[ARP.protocol_type]
         Packet.desc.protocol_type = ethertypes[Packet.ethertype]
 
         self.hardware_size = 'Length of the hardware (MAC) address.'
@@ -307,22 +307,22 @@ class Arp_desc():
         self.protocol_size = 'Length of the network protocol (IPv4) address.'
 
         # lookup opcode description
-        self.opcode = self.opcode_lookup(Arp.opcode)
+        self.opcode = self.opcode_lookup(ARP.opcode)
 
         # lookup mac addresses vendor ids
         mac_addresses = Packet.desc.mac_address_lookup(
             Packet.source_mac_address,
             Packet.destination_mac_address,
-            Arp.sender_mac_address,
-            Arp.target_mac_address
+            ARP.sender_mac_address,
+            ARP.target_mac_address
         )
         # then assign them to the correct variables
         Packet.desc.source_mac_address = \
             mac_addresses[Packet.source_mac_address]
         Packet.desc.destination_mac_address = \
             mac_addresses[Packet.destination_mac_address]
-        self.sender_mac_address = mac_addresses[Arp.sender_mac_address]
-        self.target_mac_address = mac_addresses[Arp.target_mac_address]
+        self.sender_mac_address = mac_addresses[ARP.sender_mac_address]
+        self.target_mac_address = mac_addresses[ARP.target_mac_address]
 
 
 
@@ -332,10 +332,10 @@ class Arp_desc():
 
     
     def opcode_lookup(self, opcode):
-        # takes in an arp opcode, returns it's description
+        # takes in an ARP opcode, returns it's description
 
         # 'with' statement closes the file after we are finished with it
-        opcode_file = PATH + 'arp_opcode_lookup.txt'
+        opcode_file = PATH + 'ARP_opcode_lookup.txt'
         with open(opcode_file, 'r', encoding='utf-8') as opcode_lookup:
             # skip the first two lines as they are:
             # '# Created using johnParser/functions/make_lookups.py'
@@ -360,7 +360,7 @@ class Arp_desc():
         
     
     def hardware_type_lookup(self, hardware_type):
-        hardware_type_file = PATH + 'arp_hardware_lookup.txt'
+        hardware_type_file = PATH + 'ARP_hardware_lookup.txt'
         with open(hardware_type_file, 'r', encoding='utf-8') as hardware_lookup:
             hardware_lookup.__next__()
             hardware_lookup.__next__()
