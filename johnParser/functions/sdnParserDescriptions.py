@@ -14,9 +14,9 @@
 #                                      | ex: 0806 (type: bytes)
 # my_Packet.desc.ethertype             | returns a string that describes
 #                                      | ex: 'Address Resolution Protocol (ARP)'
-# my_Packet.ARP.opcode                 | returns a bytes object
+# my_ARP.opcode                 | returns a bytes object
 #                                      | ex: 01 (type: bytes)
-# my_Packet.ARP.desc.opcode            | returns a string that describes
+# my_ARP.desc.opcode            | returns a string that describes
 #                                      | ex: 'Request' (type: string)
 # generally:                           |
 # my_Packet.variable                   | calls the data of variable
@@ -71,7 +71,7 @@ class Packet_desc():
         
         if Packet.tagged != False:
             if self.tagged == None:
-                self.tagged = 'Customer VLAN Tagged Type' 
+                self.tagged = 'Customer VLAN Tagged Type.' 
             if self.vlan_id == None:
                 self.vlan_id = \
                     self.vlan_id_lookup(Packet.vlan_id)[Packet.vlan_id]
@@ -285,10 +285,9 @@ class Packet_desc():
 
 
         return ethertype_descs
-                    
-        
+                      
 class ARP_desc():
-    def __init__(self,ARP,Packet):
+    def __init__(self, ARP, Packet):
         # lookup hardware type description
         self.hardware_type = self.hardware_type_lookup(ARP.hardware_type)
 
@@ -324,13 +323,10 @@ class ARP_desc():
         self.sender_mac_address = mac_addresses[ARP.sender_mac_address]
         self.target_mac_address = mac_addresses[ARP.target_mac_address]
 
-
-
         # TODO implement ip address lookup
-        self.sender_ip_address = 'placeholder for IP lookup'
-        self.target_ip_address = 'placeholder for IP lookup'
+        self.sender_ip_address = 'Placeholder for IPv4 address lookup.'
+        self.target_ip_address = 'Placeholder for IPv4 address lookup.'
 
-    
     def opcode_lookup(self, opcode):
         # takes in an ARP opcode, returns it's description
 
@@ -357,8 +353,6 @@ class ARP_desc():
                     opcode_desc = row[1].replace('\n', '').capitalize()
         return opcode_desc
 
-        
-    
     def hardware_type_lookup(self, hardware_type):
         hardware_type_file = PATH + 'ARP_hardware_lookup.txt'
         with open(hardware_type_file, 'r', encoding='utf-8') as hardware_lookup:
@@ -370,3 +364,36 @@ class ARP_desc():
                 if int.from_bytes(hardware_type,'big') == int(row[0]):
                     hardware_desc = row[1].replace('\n', '')
         return hardware_desc
+
+class IPv4_desc():
+    def __init__(self, IPv4):
+        self.version ='Version of the IP protocol. Should always be 4 for IPv4.'
+        self.ihl = 'Length of the IPv4 header in number of 32-bit words. Minimum 5.'
+        self.dscp = 'Differentiated Services Code Point. Default 0.'
+        self.ecn = 'Explicit Congestion Notification. Is an optional feature.'
+        self.total_length = 'Length of the entire packet, from this IPv4 header onwards.'
+        self.identification = 'Used for identifying a group of fragments.'
+        self.flags = 'Used to control or identify fragments.'
+        self.fragment_offset = 'Used to specify the offset of a particular fragment.'
+        self.ttl = 'Specified in seconds, but is used in practice as a hop count.'
+        self.protocol = 'Placeholder for IPv4 protocol lookup.'
+        self.checksum = 'Used for error checking of the IPv4 header.'
+
+        # TODO implement ip address lookup
+        self.source_ip_address = 'Placeholder for IPv4 address lookup.'
+        self.destination_ip_address = 'Placeholder for IPv4 address lookup.'
+
+class ICMP_desc():
+    def __init__(self, ICMP):
+        self.type = 'Placeholder for ICMP type lookup.'
+        self.code = 'Placeholder for ICMP code lookup.'
+        self.checksum = 'Used for error checking of the ICMP header.'
+        self.identifier ='Typically a unique identifier for every ping process.'
+        self.sequence_number = 'Typically a counter for each process.'
+
+class UDP_desc():
+    def __init__(self, UDP):
+        self.source_port = 'Placeholder for UDP port lookup.'
+        self.destination_port = 'Placeholder for UDP port lookup.'
+        self.length = 'Length of the UDP header and data.'
+        self.checksum = 'May be used for error checking of the UDP header and data.'

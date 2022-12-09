@@ -322,15 +322,15 @@ class print_ARP_info(print_packet_info):
 class print_IPv4_info(print_packet_info):
     def __init__(self, parent):
         # widths of the first 2 columns 
-        parent.widths = (8, 24)
+        parent.widths = (8, 25)
 
         parent.print_ipv4_address_table(
             'Source',
             parent.Packet.IPv4.source_ip_address,
-            '',
+            parent.Packet.IPv4.desc.source_ip_address,
             'Destination',
             parent.Packet.IPv4.destination_ip_address,
-            ''
+            parent.Packet.IPv4.desc.destination_ip_address
         )
 
         parent.print_ethertype('IPv4')
@@ -339,11 +339,8 @@ class print_IPv4_info(print_packet_info):
 
         if parent.Packet.IPv4.protocol.hex() == '01':
             print_ICMP_info(parent)
-
-        
-
-
-
+        elif parent.Packet.IPv4.protocol.hex() == '11':
+            print_UDP_info(parent)
 
     def print_ipv4_data(self, parent):
         parent.pf.print_data( 
@@ -351,7 +348,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Version',
                 parent.Packet.IPv4.version.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.version
             ],
             arrow_length = 3
         )
@@ -360,7 +357,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Header Length',
                 parent.Packet.IPv4.ihl.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.ihl
             ],
             arrow_length = 3
         )
@@ -369,7 +366,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'DSCP',
                 parent.Packet.IPv4.dscp.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.dscp
             ],
             arrow_length = 3
         )
@@ -378,7 +375,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'ECN',
                 parent.Packet.IPv4.ecn.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.ecn
             ],
             arrow_length = 3
         )
@@ -387,7 +384,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Total Length',
                 parent.Packet.IPv4.total_length.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.total_length
             ],
             arrow_length = 3
         )
@@ -396,7 +393,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Identification',
                 parent.Packet.IPv4.identification.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.identification
             ],
             arrow_length = 3
         )
@@ -405,7 +402,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Flags',
                 parent.Packet.IPv4.flags.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.flags
             ],
             arrow_length = 3
         )
@@ -414,7 +411,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Fragment Offset',
                 parent.Packet.IPv4.fragment_offset.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.fragment_offset
             ],
             arrow_length = 3
         )
@@ -423,7 +420,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Time to Live',
                 parent.Packet.IPv4.ttl.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.ttl
             ],
             arrow_length = 3
         )
@@ -432,7 +429,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Protocol',
                 parent.Packet.IPv4.protocol.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.protocol
             ],
             arrow_length = 3
         )
@@ -441,7 +438,7 @@ class print_IPv4_info(print_packet_info):
             entries = [
                 'Checksum',
                 parent.Packet.IPv4.checksum.hex().upper(), 
-                ''
+                parent.Packet.IPv4.desc.checksum
             ],
             arrow_length = 3
         )
@@ -462,7 +459,7 @@ class print_ICMP_info(print_packet_info):
             entries = [
                 'Type',
                 parent.Packet.IPv4.ICMP.type.hex().upper(), 
-                ''
+                parent.Packet.IPv4.ICMP.desc.type
             ],
             arrow_length = 3
         )
@@ -471,7 +468,7 @@ class print_ICMP_info(print_packet_info):
             entries = [
                 'Code',
                 parent.Packet.IPv4.ICMP.code.hex().upper(), 
-                ''
+                parent.Packet.IPv4.ICMP.desc.code
             ],
             arrow_length = 3
         )
@@ -480,7 +477,7 @@ class print_ICMP_info(print_packet_info):
             entries = [
                 'Checksum',
                 parent.Packet.IPv4.ICMP.checksum.hex().upper(), 
-                ''
+                parent.Packet.IPv4.ICMP.desc.checksum
             ],
             arrow_length = 3
         )
@@ -489,7 +486,7 @@ class print_ICMP_info(print_packet_info):
             entries = [
                 'Identifier',
                 parent.Packet.IPv4.ICMP.identifier.hex().upper(), 
-                ''
+                parent.Packet.IPv4.ICMP.desc.identifier
             ],
             arrow_length = 3
         )
@@ -498,9 +495,60 @@ class print_ICMP_info(print_packet_info):
             entries = [
                 'Sequence Number',
                 parent.Packet.IPv4.ICMP.sequence_number.hex().upper(), 
-                ''
+                parent.Packet.IPv4.ICMP.desc.sequence_number
             ],
             arrow_length = 3
         )
+
+class print_UDP_info(print_packet_info):
+    def __init__(self, parent):
+        parent.pf.print_data_bar(parent.widths)
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'UDP',
+                '', 
+                'User Datagram Protocol'
+            ]
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Source Port',
+                parent.Packet.IPv4.UDP.source_port.hex().upper(), 
+                parent.Packet.IPv4.UDP.desc.source_port
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Destination Port',
+                parent.Packet.IPv4.UDP.destination_port.hex().upper(), 
+                parent.Packet.IPv4.UDP.desc.destination_port
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Length',
+                parent.Packet.IPv4.UDP.length.hex().upper(), 
+                parent.Packet.IPv4.UDP.desc.length
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Checksum',
+                parent.Packet.IPv4.UDP.checksum.hex().upper(), 
+                parent.Packet.IPv4.UDP.desc.checksum
+            ],
+            arrow_length = 3
+        )
+
+
+
 
 

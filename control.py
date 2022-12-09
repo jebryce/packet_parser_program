@@ -20,12 +20,12 @@ import os
 
 
 
-hex_packets = open('johnParser/library/hexdata.txt','r').readlines()
+packets = open('johnParser/library/sflow_samples.txt','r').readlines()
 
 
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
-for hex_string in hex_packets:
+for hex_string in packets:
     os.system('cls')
 
     # convert the line into it's intended bytes object
@@ -41,7 +41,7 @@ for hex_string in hex_packets:
     # to make sure I am deleting large description dictionaries
     # print(psutil.Process().memory_info().rss / (1024*1024))
 
-    input('Press enter to view the next packet.')
+    break
 
 
 

@@ -71,14 +71,15 @@ def make_line_string(
     # once the for loop is done, example values:
     # bytes_characters = '  61 74 20 4D 61 6E 6F 61  2E 00 00 00 00 00 00 00'
     # ascii_characters = 'at Manoa._______'
-    line_format = '{line_number:04X}:{hex_chars:{width}}  ' + ascii_characters
+    line_format = '{line_num:04X}:{hex_chars:{width}}  '
     # the width variable allows for keeping the ascii characters in line with 
     # previous rows - int() rounds down to nearest whole number
     row = line_format.format(
-        line_number = line_number*bytes_per_line,
+        line_num = line_number*bytes_per_line,
         hex_chars = bytes_characters, 
         width = int(bytes_per_line*(3 + 1/column_break_spacing))
     )
+    row += ascii_characters
     return row
 
 # split the entire packet (byte_object) into each row to print
@@ -115,6 +116,7 @@ def john_hexdump(
     num_lines = math.ceil( len(byte_object) / bytes_per_line )
 
     for line in range(num_lines):
+
         # find the bytes correseponding to the current line
         partial_bytes = byte_object[line*bytes_per_line:(line+1)*bytes_per_line]
         # turn the bytes into a printable string, add it on to the string that 

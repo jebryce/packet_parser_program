@@ -76,10 +76,6 @@ class Packet:
         # descriptions for a self.variable at self.desc.variable 
         self.desc.finish_descriptions(self)
 
-
-
-
-
 class ARP:
     def __init__(self, Packet):
         # Decided to chop off the front of the packet as tagged traffic would 
@@ -144,6 +140,10 @@ class IPv4:
         self.partial_packet = Packet.partial_packet[20:]
         if self.protocol.hex() == '01':
             self.ICMP = ICMP(self)
+        elif self.protocol.hex() == '11':
+            self.UDP = UDP(self)
+
+        self.desc = sdnParserDescriptions.IPv4_desc(self)
 
 class ICMP:
     def __init__(self, IPv4):
@@ -152,4 +152,30 @@ class ICMP:
         self.checksum = IPv4.partial_packet[2:4]
         self.identifier = IPv4.partial_packet[4:6]
         self.sequence_number = IPv4.partial_packet[6:8]
+        self.payload = IPv4.partial_packet[8:]
 
+        self.desc = sdnParserDescriptions.ICMP_desc(self)
+
+class UDP:
+    def __init__(self, IPv4):
+        self.source_port = IPv4.partial_packet[0:2]
+        self.destination_port = IPv4.partial_packet[2:4]
+        self.length = IPv4.partial_packet[4:6]
+        self.checksum = IPv4.partial_packet[6:8]
+        
+        self.payload = IPv4.partial_packet[8:]
+        # 18c7 hex = 6343 dec
+        if self.destination_port.hex() == '18c7':
+            self.sFlow = sFlow(self)
+
+        self.desc = sdnParserDescriptions.UDP_desc(self)
+
+class sFlow:
+    def __init__(self, UDP):
+        self.datagram_version = UDP.payload[0:4]
+        self.agent_address_type = UDP.payload[4:8]
+        self.agent_address = UDP.payload[8:12]
+        self.sub_agent_id = UDP.payload[12:16]
+        self.sequence_number = UDP.payload[16:20]
+        self.system_uptime = UDP.payload[20:24]
+        self.number_of_samples = UDP.payload[24:28]
