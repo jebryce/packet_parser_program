@@ -15,6 +15,8 @@ class print_packet_info():
         # (this is the parsed data)
         self.Packet = Packet
 
+        self.widths = Packet.print_widths
+
         # see /functions/print_functions.py for more info. It is just a class 
         # that contains functions that format and print a string to either the 
         # console, a file, or both.
@@ -210,8 +212,6 @@ class print_packet_info():
         
 class print_ARP_info(print_packet_info):
     def __init__(self, parent):
-        # widths of the first 2 columns 
-        parent.widths = (8, 22)
         # then we just print the data of the packet
 
         # ex: 
@@ -321,9 +321,6 @@ class print_ARP_info(print_packet_info):
 
 class print_IPv4_info(print_packet_info):
     def __init__(self, parent):
-        # widths of the first 2 columns 
-        parent.widths = (8, 25)
-
         parent.print_ipv4_address_table(
             'Source',
             parent.Packet.IPv4.source_ip_address,
@@ -450,7 +447,7 @@ class print_ICMP_info(print_packet_info):
             column_widths = parent.widths,
             entries = [
                 'ICMP',
-                '', 
+                '01', 
                 'Internet Control Message Protocol'
             ]
         )
@@ -502,12 +499,21 @@ class print_ICMP_info(print_packet_info):
 
 class print_UDP_info(print_packet_info):
     def __init__(self, parent):
+
         parent.pf.print_data_bar(parent.widths)
+        self.print_UDP_data(parent)
+
+        # port 6343 dec = 18c7 hex
+        if parent.Packet.IPv4.UDP.destination_port.hex() == '18c7': 
+            print_sFlow_info(parent)
+
+
+    def print_UDP_data(self, parent):
         parent.pf.print_data( 
             column_widths = parent.widths,
             entries = [
                 'UDP',
-                '', 
+                '11', 
                 'User Datagram Protocol'
             ]
         )
@@ -547,6 +553,85 @@ class print_UDP_info(print_packet_info):
             ],
             arrow_length = 3
         )
+
+class print_sFlow_info(print_packet_info):
+    def __init__(self, parent):
+        # so I wouldn't have to type out (or copy) this long ass message
+        sFlow = parent.Packet.IPv4.UDP.sFlow
+
+        parent.pf.print_data_bar(parent.widths)
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'sFlow',
+                '18C7', 
+                'InMon sFlow (sampled flow) Protocol'
+            ]
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Version',
+                sFlow.datagram_version.hex().upper(), 
+                sFlow.desc.datagram_version
+            ],
+            arrow_length = 3
+        )  
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Address Type',
+                sFlow.agent_address_type.hex().upper(), 
+                sFlow.desc.agent_address_type
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Agent Address',
+                '{}.{}.{}.{}'.format(*sFlow.agent_address),
+                sFlow.desc.agent_address
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Sub-agent ID',
+                sFlow.sub_agent_id.hex().upper(), 
+                sFlow.desc.sub_agent_id
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Sequence Number',
+                sFlow.sequence_number.hex().upper(), 
+                sFlow.desc.sequence_number
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'System Uptime',
+                sFlow.system_uptime.hex().upper(), 
+                sFlow.desc.system_uptime
+            ],
+            arrow_length = 3
+        )
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Sample Count',
+                sFlow.number_of_samples.hex().upper(), 
+                sFlow.desc.number_of_samples
+            ],
+            arrow_length = 3
+        )
+
 
 
 

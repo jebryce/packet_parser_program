@@ -366,7 +366,7 @@ class ARP_desc():
         return hardware_desc
 
 class IPv4_desc():
-    def __init__(self, IPv4):
+    def __init__(self, IPv4, Packet):
         self.version ='Version of the IP protocol. Should always be 4 for IPv4.'
         self.ihl = 'Length of the IPv4 header in number of 32-bit words. Minimum 5.'
         self.dscp = 'Differentiated Services Code Point. Default 0.'
@@ -384,7 +384,7 @@ class IPv4_desc():
         self.destination_ip_address = 'Placeholder for IPv4 address lookup.'
 
 class ICMP_desc():
-    def __init__(self, ICMP):
+    def __init__(self, ICMP, Packet):
         self.type = 'Placeholder for ICMP type lookup.'
         self.code = 'Placeholder for ICMP code lookup.'
         self.checksum = 'Used for error checking of the ICMP header.'
@@ -392,8 +392,21 @@ class ICMP_desc():
         self.sequence_number = 'Typically a counter for each process.'
 
 class UDP_desc():
-    def __init__(self, UDP):
+    def __init__(self, UDP, Packet):
         self.source_port = 'Placeholder for UDP port lookup.'
         self.destination_port = 'Placeholder for UDP port lookup.'
         self.length = 'Length of the UDP header and data.'
         self.checksum = 'May be used for error checking of the UDP header and data.'
+
+class sFlow_desc():
+    def __init__(self, sFlow, Packet):
+        self.datagram_version = 'Version of the sFlow protocol.'
+        if sFlow.agent_address_type.hex() == '00000001':
+            self.agent_address_type = 'IPv4'
+        else:
+            self.agent_address_type = 'IPv6'
+        self.agent_address = 'Source IP address for the sFlow message.'
+        self.sub_agent_id = 'ID of the sFlow process in the switch/router.'
+        self.sequence_number = 'A counter for the number of sFlow datagrams sent.'
+        self.system_uptime = 'Uptime of the switch/router in milliseconds.'
+        self.number_of_samples = 'Number of sFlow samples sent in the packet.'

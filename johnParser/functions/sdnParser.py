@@ -34,6 +34,9 @@ class Packet:
         # packet is a bytes object
         self.packet = packet
 
+        # used for printing
+        self.print_widths = (8, 22)
+
         # ex: b'\xff\xff\xff\xff\xff\xff' (type: bytes)
         # in hex this would be: FF:FF:FF:FF:FF:FF
         self.destination_mac_address = packet[0:6]
@@ -81,6 +84,9 @@ class ARP:
         # Decided to chop off the front of the packet as tagged traffic would 
         # have different index values
 
+        # used for printing
+        Packet.print_widths = (8, 22)
+
         # ex: 0001 (type: bytes)
         self.hardware_type = Packet.partial_packet[0:2]
 
@@ -115,6 +121,10 @@ class ARP:
 
 class IPv4:
     def __init__(self, Packet):
+        
+        # used for printing
+        Packet.print_widths = (8, 23)
+
         self.version = (Packet.partial_packet[0] >> 4).to_bytes(1,'big')
         self.ihl = (Packet.partial_packet[0] & 0b1111).to_bytes(1,'big')
         self.dscp = (Packet.partial_packet[1] >> 2).to_bytes(2,'big')
@@ -139,14 +149,18 @@ class IPv4:
 
         self.partial_packet = Packet.partial_packet[20:]
         if self.protocol.hex() == '01':
-            self.ICMP = ICMP(self)
+            self.ICMP = ICMP(self, Packet)
         elif self.protocol.hex() == '11':
-            self.UDP = UDP(self)
+            self.UDP = UDP(self, Packet)
 
-        self.desc = sdnParserDescriptions.IPv4_desc(self)
+        self.desc = sdnParserDescriptions.IPv4_desc(self, Packet)
 
 class ICMP:
-    def __init__(self, IPv4):
+    def __init__(self, IPv4, Packet):
+
+        # used for printing
+        Packet.print_widths = (8, 24)
+
         self.type = IPv4.partial_packet[0:1]
         self.code = IPv4.partial_packet[1:2]
         self.checksum = IPv4.partial_packet[2:4]
@@ -154,10 +168,14 @@ class ICMP:
         self.sequence_number = IPv4.partial_packet[6:8]
         self.payload = IPv4.partial_packet[8:]
 
-        self.desc = sdnParserDescriptions.ICMP_desc(self)
+        self.desc = sdnParserDescriptions.ICMP_desc(self, Packet)
 
 class UDP:
-    def __init__(self, IPv4):
+    def __init__(self, IPv4, Packet):
+
+        # used for printing
+        Packet.print_widths = (8, 25)
+
         self.source_port = IPv4.partial_packet[0:2]
         self.destination_port = IPv4.partial_packet[2:4]
         self.length = IPv4.partial_packet[4:6]
@@ -166,12 +184,16 @@ class UDP:
         self.payload = IPv4.partial_packet[8:]
         # 18c7 hex = 6343 dec
         if self.destination_port.hex() == '18c7':
-            self.sFlow = sFlow(self)
+            self.sFlow = sFlow(self, Packet)
 
-        self.desc = sdnParserDescriptions.UDP_desc(self)
+        self.desc = sdnParserDescriptions.UDP_desc(self, Packet)
 
 class sFlow:
-    def __init__(self, UDP):
+    def __init__(self, UDP, Packet):
+
+        # used for printing
+        Packet.print_widths = (8, 33)
+
         self.datagram_version = UDP.payload[0:4]
         self.agent_address_type = UDP.payload[4:8]
         self.agent_address = UDP.payload[8:12]
@@ -179,3 +201,5 @@ class sFlow:
         self.sequence_number = UDP.payload[16:20]
         self.system_uptime = UDP.payload[20:24]
         self.number_of_samples = UDP.payload[24:28]
+
+        self.desc = sdnParserDescriptions.sFlow_desc(self, Packet)
