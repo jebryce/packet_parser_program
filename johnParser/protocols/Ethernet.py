@@ -1,32 +1,39 @@
-# see /functions/sdnParser.py for more detail
-#
-# This exists really only for humans. The /functions/sdnParser.py file from 
-# which this is called, parses all the information a computer needs. But we 
-# (hopefully) aren't computers and this function creates English strings that 
-# describe what the parsed data represents. 
-#
-# This file contains all description subclasses the main 'Packet' class 
-# creates.
-#
-# A way to call the description variable, for example:
-# my_Packet = Packet(bytes), where bytes is a packet of type bytes
-# my_Packet.ethertype                  | returns a bytes object
-#                                      | ex: 0806 (type: bytes)
-# my_Packet.desc.ethertype             | returns a string that describes
-#                                      | ex: 'Address Resolution Protocol (ARP)'
-# my_ARP.opcode                 | returns a bytes object
-#                                      | ex: 01 (type: bytes)
-# my_ARP.desc.opcode            | returns a string that describes
-#                                      | ex: 'Request' (type: string)
-# generally:                           |
-# my_Packet.variable                   | calls the data of variable
-# my_Packet.desc.variable              | calls the description of variable
-#
-import os
-from johnParser.functions import path
-PATH = path.PATH
+from johnParser.functions.path import PATH
+from johnParser.functions import print_functions
 
-class Packet_desc():
+class Ethernet:
+    def __init__(self, packet):
+        # packet is a bytes object
+        self.packet = packet
+
+        # ex: b'\xff\xff\xff\xff\xff\xff' (type: bytes)
+        # in hex this would be: FF:FF:FF:FF:FF:FF
+        self.destination_mac_address = packet[0:6]
+        self.source_mac_address = packet[6:12]
+
+        # Check if tagged traffic, 
+        # the .hex() function converts the bytes object to a string of hex 
+        # values, 8100 is the EtherType 802.1Q (aka tagged traffic)
+        if packet[12:14].hex()=='8100':
+            # 8100 (type: bytes)
+            self.tagged = packet[12:14]
+
+            # ex: 0003 (type: bytes)
+            self.vlan_id = packet[14:16]
+
+            # the rest of the packet, this is to avoid a seperate variable to 
+            # keep track of the differing index due to the 802.1Q header
+            partialPacket = packet[16:]
+        else:
+            self.tagged = False
+            partialPacket = packet[12:]
+
+        # ex: 0806 (type: bytes)
+        self.ethertype = partialPacket[0:2]
+
+        self.partial_packet = partialPacket[2:]
+
+class Ethernet_desc():
     def __init__(self, Packet):
         # Packet variable is an object of Packet class defined 
         # in /functions/sdnParser.py
@@ -286,127 +293,189 @@ class Packet_desc():
 
         return ethertype_descs
                       
-class ARP_desc():
-    def __init__(self, ARP, Packet):
-        # lookup hardware type description
-        self.hardware_type = self.hardware_type_lookup(ARP.hardware_type)
+class print_Ethernet():
+    def __init__(
+        self, Packet, console = True, file_path = None, bar_length = 150
+    ):
+        # Packet variable is an object of Packet class defined 
+        # in /functions/sdnParser.py
+        # (this is the parsed data)
+        self.Packet = Packet
 
-        # this shares the same EtherType numbers/descriptions
-        # so lookup all ethertype descriptions
-        ethertypes = Packet.desc.ethertype_lookup(
-            ARP.protocol_type,
-            Packet.ethertype
+        self.widths = (8, 30)
+
+        # see /functions/print_functions.py for more info. It is just a class 
+        # that contains functions that format and print a string to either the 
+        # console, a file, or both.
+        self.pf = print_functions.print_functions(
+            console, file_path, bar_length
         )
-        # then assign them to the correct variables
-        self.protocol_type = ethertypes[ARP.protocol_type]
-        Packet.desc.protocol_type = ethertypes[Packet.ethertype]
 
-        self.hardware_size = 'Length of the hardware (MAC) address.'
-
-        self.protocol_size = 'Length of the network protocol (IPv4) address.'
-
-        # lookup opcode description
-        self.opcode = self.opcode_lookup(ARP.opcode)
-
-        # lookup mac addresses vendor ids
-        mac_addresses = Packet.desc.mac_address_lookup(
-            Packet.source_mac_address,
-            Packet.destination_mac_address,
-            ARP.sender_mac_address,
-            ARP.target_mac_address
+        # first print the ethernet frames mac addresses
+        # ex:
+        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #        Type |    MAC Address    | Vendor ID 
+        # ------------+-------------------+-------------------------------------
+        #      Source | B8:27:EB:3C:2D:60 | Raspberry Pi Foundation 
+        # Destination | FF:FF:FF:FF:FF:FF | Broadcast 
+        self.print_mac_address_table(
+            'Source', 
+            Packet.source_mac_address, 
+            Packet.desc.source_mac_address, 
+            'Destination',
+            Packet.destination_mac_address, 
+            Packet.desc.destination_mac_address
         )
-        # then assign them to the correct variables
-        Packet.desc.source_mac_address = \
-            mac_addresses[Packet.source_mac_address]
-        Packet.desc.destination_mac_address = \
-            mac_addresses[Packet.destination_mac_address]
-        self.sender_mac_address = mac_addresses[ARP.sender_mac_address]
-        self.target_mac_address = mac_addresses[ARP.target_mac_address]
+        
+    def print_mac_address_table(
+       self, source_title, source_mac, source_mac_desc,
+       dest_title, dest_mac, dest_mac_desc
+    ):
+        # from the example below, source_title = 'Source' (type: string)
+        # source_mac_address = bB27EB3C2D60 (type: bytes)
+        # source_mac_desc = 'Raspberry Pi Foundation' (type: string)
+        # dest(ination) variables are similar
+        # ex:
+        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #        Type |    MAC Address    | Vendor ID 
+        # ------------+-------------------+-------------------------------------
+        #      Source | B8:27:EB:3C:2D:60 | Raspberry Pi Foundation 
+        # Destination | FF:FF:FF:FF:FF:FF | Broadcast 
 
-        # TODO implement ip address lookup
-        self.sender_ip_address = 'Placeholder for IPv4 address lookup.'
-        self.target_ip_address = 'Placeholder for IPv4 address lookup.'
+        mac_widths = [11, 17]
 
-    def opcode_lookup(self, opcode):
-        # takes in an ARP opcode, returns it's description
+        # Print the table as shown above, each self.pf.print_x call prints a row
+        # print mac address column headers
+        self.pf.print_bar()
+        self.pf.print_data(
+            column_widths = mac_widths,
+            entries = ['Type', 'MAC Address', 'Vendor ID'],
+            just = '^'
+        )
+        self.pf.print_data_bar(column_widths = mac_widths)
+        # print source mac address
+        self.pf.print_data(
+            column_widths = mac_widths,
+            entries = [
+                source_title,
+                source_mac.hex(':').upper(), 
+                source_mac_desc
+            ],
+            just = '^'
+        )
+        # print destination mac address
+        self.pf.print_data(
+            column_widths = mac_widths,
+            entries = [
+                dest_title,
+                dest_mac.hex(':').upper(), 
+                dest_mac_desc
+            ],
+            just = '^'
+        )
+        
+    def print_ipv4_address_table(
+        self, source_title, source_ipv4, source_ipv4_desc, 
+        dest_title, dest_ipv4, dest_ipv4_desc
+    ):
+        # from the example below, source_title = 'Source' (type: string)
+        # source_ipv4_address = bA9FEB234 (type: bytes)
+        # source_ipv4_desc = 'placeholder for IP lookup' (type: string)
+        # dest(ination) variables are similar
+        # ex:
+        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #        Type |   IPv4 Address    | Location 
+        # ------------+-------------------+-------------------------------------
+        #  ARP Sender |  169.254.178.52   | placeholder for IP lookup 
+        #  ARP Target |    128.171.1.1    | placeholder for IP lookup 
+        
+        ipv4_widths = [11, 17]
 
-        # 'with' statement closes the file after we are finished with it
-        opcode_file = PATH + 'ARP_opcode_lookup.txt'
-        with open(opcode_file, 'r', encoding='utf-8') as opcode_lookup:
-            # skip the first two lines as they are:
-            # '# Created using johnParser/functions/make_lookups.py'
-            # and
-            # 'Number Operation Code (op)'
-            opcode_lookup.__next__()
-            opcode_lookup.__next__()
-            
-            # default description
-            opcode_desc = 'Unassigned'
+        # Honestly am surprised this worked
+        # this is convert a 4-octet ipv4 address (in type bytes)
+        # to a human-readable ip address in the format int.int.int.int
+        bytes2ip = '{}.{}.{}.{}'
+        # example: bytes2ip.format(*variable)
+        # need the asterisk (the unpacking operator), where variable is a 
+        # 4-octet bytes object
+    
+        # Print the table as shown above, each self.pf.print_x call prints a row
+        # print ipv4 column headers
+        self.pf.print_bar()
+        self.pf.print_data(
+            column_widths = ipv4_widths,
+            entries = ['Type', 'IPv4 Address', 'Location'],
+            just = '^'
+        )
+        self.pf.print_data_bar(column_widths = ipv4_widths)
+        # print source ipv4 address
+        self.pf.print_data(
+            column_widths = ipv4_widths,
+            entries = [
+                source_title,
+                bytes2ip.format(*source_ipv4), 
+                source_ipv4_desc
+            ],
+            just = '^'
+        )
+        # print destination ipv4 address
+        self.pf.print_data(
+            column_widths = ipv4_widths,
+            entries = [
+                dest_title,
+                bytes2ip.format(*dest_ipv4), 
+                dest_ipv4_desc
+            ],
+            just = '^'
+        )
 
-            # we look through the file and try to reassign the variable
-            for row in opcode_lookup:
-                # splits each row into a list of two values, first value is
-                # the opcode, and the second vlaue is the description
-                # ex: (type: list) ['1', 'REQUEST\n']
-                row = row.split(' ', 1)
-                if int.from_bytes(opcode,'big') == int(row[0]):
-                    opcode_desc = row[1].replace('\n', '').capitalize()
-        return opcode_desc
+    def print_ethertype(self, ethertype_abbreviation):
+        # from the example below, column_widths is a list of two integers that 
+        # determine the widths of the first two columns. In this example it is 
+        # [9, 22] (type: list of two integers)
+        # ethertype_abbreviation = 'ARP' (type: string)
+        # ex:
+        #% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        #  EtherType | Value (hex)            | Description 
+        # -----------+------------------------+---------------------------------
+        #     802.1Q | 8100                   | Customer VLAN Tagged Type 
+        #            |--> VLAN ID: 0003       | SDN Production VLAN 
+        # -----------+------------------------+---------------------------------
+        #        ARP | 0806                   | Address Resolution Protocol
 
-    def hardware_type_lookup(self, hardware_type):
-        hardware_type_file = PATH + 'ARP_hardware_lookup.txt'
-        with open(hardware_type_file, 'r', encoding='utf-8') as hardware_lookup:
-            hardware_lookup.__next__()
-            hardware_lookup.__next__()
-            hardware_desc = 'Unassigned'
-            for row in hardware_lookup:
-                row = row.split(' ',1)
-                if int.from_bytes(hardware_type,'big') == int(row[0]):
-                    hardware_desc = row[1].replace('\n', '')
-        return hardware_desc
 
-class IPv4_desc():
-    def __init__(self, IPv4, Packet):
-        self.version ='Version of the IP protocol. Should always be 4 for IPv4.'
-        self.ihl = 'Length of the IPv4 header in number of 32-bit words. Minimum 5.'
-        self.dscp = 'Differentiated Services Code Point. Default 0.'
-        self.ecn = 'Explicit Congestion Notification. Is an optional feature.'
-        self.total_length = 'Length of the entire packet, from this IPv4 header onwards.'
-        self.identification = 'Used for identifying a group of fragments.'
-        self.flags = 'Used to control or identify fragments.'
-        self.fragment_offset = 'Used to specify the offset of a particular fragment.'
-        self.ttl = 'Specified in seconds, but is used in practice as a hop count.'
-        self.protocol = 'Placeholder for IPv4 protocol lookup.'
-        self.checksum = 'Used for error checking of the IPv4 header.'
+        # Print EtherType column headers
+        self.pf.print_bar()
+        self.pf.print_data(
+            column_widths=self.widths,
+            entries=['Protocol', 'Value (hex)', 'Description']
+        )
+        self.pf.print_data_bar(column_widths = self.widths)
 
-        # TODO implement ip address lookup
-        self.source_ip_address = 'Placeholder for IPv4 address lookup.'
-        self.destination_ip_address = 'Placeholder for IPv4 address lookup.'
+        # Print if tagged traffic
+        if self.Packet.tagged != False:
+            self.pf.print_data(
+                column_widths = self.widths,
+                entries = ['802.1Q', '8100', self.Packet.desc.tagged]
+            )
+            self.pf.print_data(
+                column_widths = self.widths,
+                entries = [
+                    'VLAN ID', 
+                    self.Packet.vlan_id.hex().upper(),
+                    self.Packet.desc.vlan_id
+                ],
+                arrow_length = 3
+            )
+            self.pf.print_data_bar(column_widths = self.widths)
 
-class ICMP_desc():
-    def __init__(self, ICMP, Packet):
-        self.type = 'Placeholder for ICMP type lookup.'
-        self.code = 'Placeholder for ICMP code lookup.'
-        self.checksum = 'Used for error checking of the ICMP header.'
-        self.identifier ='Typically a unique identifier for every ping process.'
-        self.sequence_number = 'Typically a counter for each process.'
-
-class UDP_desc():
-    def __init__(self, UDP, Packet):
-        self.source_port = 'Placeholder for UDP port lookup.'
-        self.destination_port = 'Placeholder for UDP port lookup.'
-        self.length = 'Length of the UDP header and data.'
-        self.checksum = 'May be used for error checking of the UDP header and data.'
-
-class sFlow_desc():
-    def __init__(self, sFlow, Packet):
-        self.datagram_version = 'Version of the sFlow protocol.'
-        if sFlow.agent_address_type.hex() == '00000001':
-            self.agent_address_type = 'IPv4'
-        else:
-            self.agent_address_type = 'IPv6'
-        self.agent_address = 'Source IP address for the sFlow message.'
-        self.sub_agent_id = 'ID of the sFlow process in the switch/router.'
-        self.sequence_number = 'A counter for the number of sFlow datagrams sent.'
-        self.system_uptime = 'Uptime of the switch/router in milliseconds.'
-        self.number_of_samples = 'Number of sFlow samples sent in the packet.'
+        # print the ethertype of the packet
+        self.pf.print_data(
+            column_widths = self.widths,
+            entries = [
+                ethertype_abbreviation,
+                self.Packet.ethertype.hex().upper(), 
+                self.Packet.desc.ethertype
+                ]
+        )
+        
