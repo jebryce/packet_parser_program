@@ -6,6 +6,8 @@ class ARP():
         # Decided to chop off the front of the packet as tagged traffic would 
         # have different index values
 
+        Packet.update_widths(8, 22)
+
         # ex: 0001 (type: bytes)
         self.hardware_type = Packet.partial_packet[0:2]
 

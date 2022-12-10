@@ -1,6 +1,9 @@
 from johnParser.protocols import Ethernet
 class UDP():
     def __init__(self, Packet):
+
+        Packet.update_widths(8, 25)
+
         self.source_port = Packet.IPv4.partial_packet[0:2]
         self.destination_port = Packet.IPv4.partial_packet[2:4]
         self.length = Packet.IPv4.partial_packet[4:6]

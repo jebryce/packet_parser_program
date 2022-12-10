@@ -2,6 +2,9 @@ from johnParser.protocols import Ethernet
 
 class ICMP():
     def __init__(self, Packet):
+
+        Packet.update_widths(8, 24)
+        
         self.type = Packet.IPv4.partial_packet[0:1]
         self.code = Packet.IPv4.partial_packet[1:2]
         self.checksum = Packet.IPv4.partial_packet[2:4]

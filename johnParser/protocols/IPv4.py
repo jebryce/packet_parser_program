@@ -2,6 +2,9 @@ from johnParser.protocols import Ethernet
 
 class IPv4():
     def __init__(self, Packet):
+
+        Packet.update_widths(8, 23)
+
         self.version = (Packet.partial_packet[0] >> 4).to_bytes(1,'big')
         self.ihl = (Packet.partial_packet[0] & 0b1111).to_bytes(1,'big')
         self.dscp = (Packet.partial_packet[1] >> 2).to_bytes(2,'big')

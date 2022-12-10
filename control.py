@@ -26,7 +26,7 @@ packets = open('johnParser/library/test_cases.txt','r').readlines()
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
 for hex_string in packets[2:]:
-    #os.system('cls')
+    os.system('cls')
 
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)

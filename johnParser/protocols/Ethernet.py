@@ -33,6 +33,15 @@ class Ethernet:
 
         self.partial_packet = partialPacket[2:]
 
+        
+        self.widths = (8, 11)
+
+    def update_widths(self, *new_widths):
+        self.widths = (
+            max(self.widths[0], new_widths[0]),
+            max(self.widths[1], new_widths[1])
+        )
+
 class Ethernet_desc():
     def __init__(self, Packet):
         # Packet variable is an object of Packet class defined 
@@ -302,7 +311,7 @@ class print_Ethernet():
         # (this is the parsed data)
         self.Packet = Packet
 
-        self.widths = (8, 30)
+        self.widths = Packet.widths
 
         # see /functions/print_functions.py for more info. It is just a class 
         # that contains functions that format and print a string to either the 
@@ -326,7 +335,7 @@ class print_Ethernet():
             Packet.destination_mac_address, 
             Packet.desc.destination_mac_address
         )
-        
+
     def print_mac_address_table(
        self, source_title, source_mac, source_mac_desc,
        dest_title, dest_mac, dest_mac_desc

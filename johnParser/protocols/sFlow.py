@@ -2,6 +2,9 @@ from johnParser.protocols import Ethernet
 
 class sFlow():
     def __init__(self, Packet):
+
+        Packet.update_widths(8, 28)
+
         self.datagram_version = Packet.IPv4.UDP.payload[0:4]
         self.agent_address_type = Packet.IPv4.UDP.payload[4:8]
         self.agent_address = Packet.IPv4.UDP.payload[8:12]
@@ -59,7 +62,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Agent Address',
-                '{}.{}.{}.{}'.format(*sFlow.agent_address),
+                sFlow.agent_address.hex().upper(),
                 sFlow.desc.agent_address
             ],
             arrow_length = 3
