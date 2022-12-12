@@ -11,21 +11,21 @@
 #
 # This is used for testing only
 #
-from johnParser.functions import print_Packet
-from johnParser.functions import Packet_Parser
-from johnParser.functions import make_library
+from PPP.functions import print_Packet
+from PPP.functions import Packet_Parser
+from PPP.functions import make_library
 import os
-#make_library.make_library()
+# make_library.make_library()
 
 
 
 
-packets = open('johnParser/library/test_cases.txt','r').readlines()
+packets = open('PPP/library/test_cases.txt','r').readlines()
 
 
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
-for hex_string in packets[2:]:
+for hex_string in packets[:]:
     os.system('cls')
 
     # convert the line into it's intended bytes object
@@ -40,7 +40,6 @@ for hex_string in packets[2:]:
     # to make sure I am deleting large description dictionaries
     # print(psutil.Process().memory_info().rss / (1024*1024))
 
-    break
 
 
 
