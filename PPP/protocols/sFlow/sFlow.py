@@ -12,6 +12,7 @@ class sFlow():
         self.sequence_number = Packet.IPv4.UDP.payload[16:20]
         self.system_uptime = Packet.IPv4.UDP.payload[20:24]
         self.number_of_samples = Packet.IPv4.UDP.payload[24:28]
+        self.samples = Packet.IPv4.UDP.payload[28:]
 
 class sFlow_desc():
     def __init__(self, Packet):

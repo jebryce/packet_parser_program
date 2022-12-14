@@ -17,7 +17,8 @@
 # my_Packet.variable                   | calls the data of variable
 # my_Packet.desc.variable              | calls the description of variable
 # 
-from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP, sFlow
+from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP
+from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample
 
 # create both parsed data and the descriptions
 
@@ -28,6 +29,9 @@ from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP, sFlow
 #       ICMP
 #       UDP
 #           sFlow
+#               flow_sample
+#               counters_sample
+
 
 def Parser(packet):
     Packet = Ethernet.Ethernet(packet)
@@ -61,7 +65,14 @@ def UDP_tree(Packet):
     if Packet.IPv4.UDP.destination_port.hex() == '18c7':
         Packet.IPv4.UDP.sFlow = sFlow.sFlow(Packet)
         Packet.IPv4.UDP.sFlow.desc = sFlow.sFlow_desc(Packet)
+        sFlow_tree(Packet)
 
-
+def sFlow_tree(Packet):
+    sFlow = Packet.IPv4.UDP.sFlow
+    if sFlow.samples[0:4].hex() == '00000001':
+        sFlow.flow_sample = flow_sample.flow_sample(Packet)
+        sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
+    elif sFlow.samples[0:4].hex() == '00000002':
+        sFlow.counters_sample = counters_sample.counters_sample(Packet)
+        sFlow.counters_sample.desc =counters_sample.counters_sample_desc(Packet)
         
-

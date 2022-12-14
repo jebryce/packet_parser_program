@@ -14,6 +14,7 @@
 from PPP.functions import print_Packet
 from PPP.functions import Packet_Parser
 from PPP.functions import make_library
+from PPP.functions import john_hexdump
 import os
 
 # uncomment this make_library function to create files at ~/Documents/PPP/ that 
@@ -22,14 +23,17 @@ import os
 
 
 
-location = 'PPP/library/test_cases.txt'
+location = 'PPP/library/tests.txt'
 packets = open(location,'r').readlines()
 
 
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
-for hex_string in packets:
-    os.system('clear')
+for hex_string in packets[2:]:
+    # os.system('clear')
+    print()
+    print()
+    print()
 
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
@@ -39,9 +43,12 @@ for hex_string in packets:
 
     # print the objects information to console
     print_Packet.Printer(Packet)
+ 
+    # print(john_hexdump.john_hexdump(pkt,32,8,'_'))
 
-    input('Press enter to continue.')
-print('End of file reached.')
+    
+#     input('Press enter to continue.')
+# print('End of file reached.')
 
 
 

@@ -1,7 +1,7 @@
 from PPP.functions.path import PATH
 from PPP.functions import print_functions
 
-class Ethernet:
+class Ethernet():
     def __init__(self, packet):
         # packet is a bytes object
         self.packet = packet
@@ -41,6 +41,12 @@ class Ethernet:
             max(self.widths[0], new_widths[0]),
             max(self.widths[1], new_widths[1])
         )
+    
+    def extract_bits(self, raw: bytes, mask: int):
+        length = len(raw)
+        decimal = int.from_bytes(raw, 'big')
+        extracted = decimal & mask
+        return extracted.to_bytes(length, 'big')
 
 class Ethernet_desc():
     def __init__(self, Packet):
