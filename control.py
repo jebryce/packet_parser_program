@@ -31,9 +31,6 @@ packets = open(location,'r').readlines()
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
 for hex_string in packets[2:]:
     # os.system('clear')
-    print()
-    print()
-    print()
 
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
