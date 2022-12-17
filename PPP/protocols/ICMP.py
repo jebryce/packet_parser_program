@@ -38,7 +38,7 @@ class print_ICMP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.ICMP.type.hex().upper(), 
                 parent.Packet.IPv4.ICMP.desc.type
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -47,7 +47,7 @@ class print_ICMP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.ICMP.code.hex().upper(), 
                 parent.Packet.IPv4.ICMP.desc.code
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -56,7 +56,7 @@ class print_ICMP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.ICMP.checksum.hex().upper(), 
                 parent.Packet.IPv4.ICMP.desc.checksum
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -65,7 +65,7 @@ class print_ICMP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.ICMP.identifier.hex().upper(), 
                 parent.Packet.IPv4.ICMP.desc.identifier
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -74,5 +74,5 @@ class print_ICMP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.ICMP.sequence_number.hex().upper(), 
                 parent.Packet.IPv4.ICMP.desc.sequence_number
             ],
-            arrow_length = 3
+            arrow_length = 2
         )

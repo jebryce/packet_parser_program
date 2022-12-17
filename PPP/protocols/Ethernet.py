@@ -480,7 +480,7 @@ class print_Ethernet():
                     self.Packet.vlan_id.hex().upper(),
                     self.Packet.desc.vlan_id
                 ],
-                arrow_length = 3
+                arrow_length = 2
             )
             self.pf.print_data_bar(column_widths = self.widths)
 

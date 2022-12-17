@@ -177,7 +177,7 @@ class print_ARP(Ethernet.print_Ethernet):
                 parent.Packet.ARP.hardware_type.hex().upper(), 
                 parent.Packet.ARP.desc.hardware_type
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         # print protocol type
         parent.pf.print_data( 
@@ -187,7 +187,7 @@ class print_ARP(Ethernet.print_Ethernet):
                 parent.Packet.ARP.protocol_type.hex().upper(), 
                 parent.Packet.ARP.desc.protocol_type
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         # print hardware size
         parent.pf.print_data( 
@@ -197,7 +197,7 @@ class print_ARP(Ethernet.print_Ethernet):
                 parent.Packet.ARP.hardware_size.hex().upper(), 
                 parent.Packet.ARP.desc.hardware_size
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         # print protocol size
         parent.pf.print_data( 
@@ -207,7 +207,7 @@ class print_ARP(Ethernet.print_Ethernet):
                 parent.Packet.ARP.protocol_size.hex().upper(), 
                 parent.Packet.ARP.desc.protocol_size
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         # print opcode
         parent.pf.print_data( 
@@ -217,5 +217,5 @@ class print_ARP(Ethernet.print_Ethernet):
                 parent.Packet.ARP.opcode.hex().upper(), 
                 parent.Packet.ARP.desc.opcode
             ],
-            arrow_length = 3
+            arrow_length = 2
         )

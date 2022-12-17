@@ -35,7 +35,7 @@ class print_UDP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.UDP.source_port.hex().upper(), 
                 parent.Packet.IPv4.UDP.desc.source_port
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -44,7 +44,7 @@ class print_UDP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.UDP.destination_port.hex().upper(), 
                 parent.Packet.IPv4.UDP.desc.destination_port
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -53,7 +53,7 @@ class print_UDP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.UDP.length.hex().upper(), 
                 parent.Packet.IPv4.UDP.desc.length
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -62,5 +62,5 @@ class print_UDP(Ethernet.print_Ethernet):
                 parent.Packet.IPv4.UDP.checksum.hex().upper(), 
                 parent.Packet.IPv4.UDP.desc.checksum
             ],
-            arrow_length = 3
+            arrow_length = 2
         )

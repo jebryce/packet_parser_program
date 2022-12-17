@@ -48,7 +48,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.datagram_version.hex().upper(), 
                 sFlow.desc.datagram_version
             ],
-            arrow_length = 3
+            arrow_length = 2
         )  
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -57,7 +57,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.agent_address_type.hex().upper(), 
                 sFlow.desc.agent_address_type
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -66,7 +66,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.agent_address.hex().upper(),
                 sFlow.desc.agent_address
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -75,7 +75,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.sub_agent_id.hex().upper(), 
                 sFlow.desc.sub_agent_id
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -84,7 +84,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.sequence_number.hex().upper(), 
                 sFlow.desc.sequence_number
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -93,7 +93,7 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.system_uptime.hex().upper(), 
                 sFlow.desc.system_uptime
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -102,5 +102,5 @@ class print_sFlow(Ethernet.print_Ethernet):
                 sFlow.number_of_samples.hex().upper(), 
                 sFlow.desc.number_of_samples
             ],
-            arrow_length = 3
+            arrow_length = 2
         )
