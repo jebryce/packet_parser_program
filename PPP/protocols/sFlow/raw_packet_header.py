@@ -15,8 +15,11 @@ class raw_packet_header():
         self.payload_stripped = raw_header[16:20]
 
         self.sampled_header_length = raw_header[20:24]
+        
+        header_length = int.from_bytes(self.sampled_header_length, 'big')
+        self.sampled_packet = raw_header[24:24 + header_length]
 
-        self.sampled_packet = raw_header[24:]
+        self.switch_data = raw_header[24 + header_length : ]
 
 class raw_packet_header_desc():
     def __init__(self, Packet):

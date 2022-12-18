@@ -162,7 +162,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
                 flow_sample.output_interface_format, 
                 flow_sample.desc.output_interface_format
             ],
-            arrow_length = 6
+            arrow_length = 4
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
@@ -171,7 +171,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
                 flow_sample.output_interface_value, 
                 flow_sample.desc.output_interface_value
             ],
-            arrow_length = 6
+            arrow_length = 4
         )
         parent.pf.print_data( 
             column_widths = parent.widths,
