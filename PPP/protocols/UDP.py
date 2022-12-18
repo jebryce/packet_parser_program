@@ -32,7 +32,7 @@ class print_UDP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Source Port',
-                parent.Packet.IPv4.UDP.source_port.hex().upper(), 
+                parent.Packet.IPv4.UDP.source_port, 
                 parent.Packet.IPv4.UDP.desc.source_port
             ],
             arrow_length = 2
@@ -41,7 +41,7 @@ class print_UDP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Destination Port',
-                parent.Packet.IPv4.UDP.destination_port.hex().upper(), 
+                parent.Packet.IPv4.UDP.destination_port, 
                 parent.Packet.IPv4.UDP.desc.destination_port
             ],
             arrow_length = 2
@@ -50,7 +50,7 @@ class print_UDP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Length',
-                parent.Packet.IPv4.UDP.length.hex().upper(), 
+                parent.Packet.IPv4.UDP.length, 
                 parent.Packet.IPv4.UDP.desc.length
             ],
             arrow_length = 2
@@ -59,7 +59,7 @@ class print_UDP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Checksum',
-                parent.Packet.IPv4.UDP.checksum.hex().upper(), 
+                parent.Packet.IPv4.UDP.checksum, 
                 parent.Packet.IPv4.UDP.desc.checksum
             ],
             arrow_length = 2

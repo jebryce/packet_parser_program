@@ -174,7 +174,7 @@ class print_ARP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Hardware Type',
-                parent.Packet.ARP.hardware_type.hex().upper(), 
+                parent.Packet.ARP.hardware_type, 
                 parent.Packet.ARP.desc.hardware_type
             ],
             arrow_length = 2
@@ -184,7 +184,7 @@ class print_ARP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Protocol Type',
-                parent.Packet.ARP.protocol_type.hex().upper(), 
+                parent.Packet.ARP.protocol_type, 
                 parent.Packet.ARP.desc.protocol_type
             ],
             arrow_length = 2
@@ -194,7 +194,7 @@ class print_ARP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Hardware Size',
-                parent.Packet.ARP.hardware_size.hex().upper(), 
+                parent.Packet.ARP.hardware_size, 
                 parent.Packet.ARP.desc.hardware_size
             ],
             arrow_length = 2
@@ -204,7 +204,7 @@ class print_ARP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Protocol Size',
-                parent.Packet.ARP.protocol_size.hex().upper(), 
+                parent.Packet.ARP.protocol_size, 
                 parent.Packet.ARP.desc.protocol_size
             ],
             arrow_length = 2
@@ -214,7 +214,7 @@ class print_ARP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Opcode',
-                parent.Packet.ARP.opcode.hex().upper(), 
+                parent.Packet.ARP.opcode, 
                 parent.Packet.ARP.desc.opcode
             ],
             arrow_length = 2

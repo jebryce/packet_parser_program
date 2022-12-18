@@ -45,7 +45,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Version',
-                sFlow.datagram_version.hex().upper(), 
+                sFlow.datagram_version, 
                 sFlow.desc.datagram_version
             ],
             arrow_length = 2
@@ -54,7 +54,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Address Type',
-                sFlow.agent_address_type.hex().upper(), 
+                sFlow.agent_address_type, 
                 sFlow.desc.agent_address_type
             ],
             arrow_length = 2
@@ -63,7 +63,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Agent Address',
-                sFlow.agent_address.hex().upper(),
+                sFlow.agent_address,
                 sFlow.desc.agent_address
             ],
             arrow_length = 2
@@ -72,7 +72,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sub-agent ID',
-                sFlow.sub_agent_id.hex().upper(), 
+                sFlow.sub_agent_id, 
                 sFlow.desc.sub_agent_id
             ],
             arrow_length = 2
@@ -81,7 +81,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sequence Number',
-                sFlow.sequence_number.hex().upper(), 
+                sFlow.sequence_number, 
                 sFlow.desc.sequence_number
             ],
             arrow_length = 2
@@ -90,7 +90,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'System Uptime',
-                sFlow.system_uptime.hex().upper(), 
+                sFlow.system_uptime, 
                 sFlow.desc.system_uptime
             ],
             arrow_length = 2
@@ -99,7 +99,7 @@ class print_sFlow(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sample Count',
-                sFlow.number_of_samples.hex().upper(), 
+                sFlow.number_of_samples, 
                 sFlow.desc.number_of_samples
             ],
             arrow_length = 2

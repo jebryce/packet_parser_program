@@ -65,7 +65,7 @@ class print_functions():
     # '              VLAN ID | 3                 | SDN Production'
     # '                      |--> VLAN ID: 3     | SDN Production'
     # (function combines first 2 columns in event of a passed arrow length)
-    def print_data(self, column_widths, entries, arrow_length = 0, just = '<'):
+    def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True):
         # column_widths should be a list of 2 integers, corresponding with the 
         # widths of the first two columns. The third column's width will be 
         # calculated using the bar_length variable passed when calling the class
@@ -88,6 +88,11 @@ class print_functions():
         # '        Type | MAC Address       | Vendor ID ' 
         # ex if just = '^' then:
         # '        Type |    MAC Address    | Vendor ID '
+
+        if type(entries[1]) == bytes:
+            entries[1] = entries[1].hex().upper().lstrip('0')
+            if entries[1] == '':
+                entries[1] = '0'
 
 
         # at the ends of this function, it calls a custom print function and 

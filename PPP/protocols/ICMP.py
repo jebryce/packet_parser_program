@@ -27,7 +27,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'ICMP',
-                '01', 
+                '1', 
                 'Internet Control Message Protocol'
             ]
         )
@@ -35,7 +35,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Type',
-                parent.Packet.IPv4.ICMP.type.hex().upper(), 
+                parent.Packet.IPv4.ICMP.type, 
                 parent.Packet.IPv4.ICMP.desc.type
             ],
             arrow_length = 2
@@ -44,7 +44,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Code',
-                parent.Packet.IPv4.ICMP.code.hex().upper(), 
+                parent.Packet.IPv4.ICMP.code, 
                 parent.Packet.IPv4.ICMP.desc.code
             ],
             arrow_length = 2
@@ -53,7 +53,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Checksum',
-                parent.Packet.IPv4.ICMP.checksum.hex().upper(), 
+                parent.Packet.IPv4.ICMP.checksum, 
                 parent.Packet.IPv4.ICMP.desc.checksum
             ],
             arrow_length = 2
@@ -62,7 +62,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Identifier',
-                parent.Packet.IPv4.ICMP.identifier.hex().upper(), 
+                parent.Packet.IPv4.ICMP.identifier, 
                 parent.Packet.IPv4.ICMP.desc.identifier
             ],
             arrow_length = 2
@@ -71,7 +71,7 @@ class print_ICMP(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sequence Number',
-                parent.Packet.IPv4.ICMP.sequence_number.hex().upper(), 
+                parent.Packet.IPv4.ICMP.sequence_number, 
                 parent.Packet.IPv4.ICMP.desc.sequence_number
             ],
             arrow_length = 2

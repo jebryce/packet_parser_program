@@ -30,7 +30,7 @@ packets = open(location,'r').readlines()
 # for each line in the text file, 
 # ex hex_string = 'ff59a300c763a8f2' (type: string)
 for hex_string in packets[2:]:
-    os.system('cls')
+    os.system('clear')
 
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
@@ -43,6 +43,7 @@ for hex_string in packets[2:]:
  
     # print(john_hexdump.john_hexdump(pkt,32,8,'_'))
 
+    break
     
 #     input('Press enter to continue.')
 # print('End of file reached.')

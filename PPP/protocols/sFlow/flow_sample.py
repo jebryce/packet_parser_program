@@ -69,7 +69,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Enterprise',
-                flow_sample.enterprise.hex().upper(), 
+                flow_sample.enterprise, 
                 flow_sample.desc.enterprise
             ],
             arrow_length = 4
@@ -78,7 +78,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sample Type',
-                flow_sample.sample_type.hex().upper(), 
+                flow_sample.sample_type, 
                 flow_sample.desc.sample_type
             ],
             arrow_length = 4
@@ -87,7 +87,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sample Length',
-                flow_sample.sample_length.hex().upper(), 
+                flow_sample.sample_length, 
                 flow_sample.desc.sample_length
             ],
             arrow_length = 4
@@ -96,7 +96,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sequence Number',
-                flow_sample.sequence_number.hex().upper(), 
+                flow_sample.sequence_number, 
                 flow_sample.desc.sequence_number
             ],
             arrow_length = 4
@@ -105,7 +105,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Source ID Class',
-                flow_sample.source_id_class.hex().upper(), 
+                flow_sample.source_id_class, 
                 flow_sample.desc.source_id_class
             ],
             arrow_length = 4
@@ -114,7 +114,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Index',
-                flow_sample.index.hex().upper(), 
+                flow_sample.index, 
                 flow_sample.desc.index
             ],
             arrow_length = 4
@@ -123,7 +123,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sampling Rate',
-                flow_sample.sampling_rate.hex().upper(), 
+                flow_sample.sampling_rate, 
                 flow_sample.desc.sampling_rate
             ],
             arrow_length = 4
@@ -132,7 +132,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sample Pool',
-                flow_sample.sample_pool.hex().upper(), 
+                flow_sample.sample_pool, 
                 flow_sample.desc.sample_pool
             ],
             arrow_length = 4
@@ -141,7 +141,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Dropped Packets',
-                flow_sample.dropped_packets.hex().upper(), 
+                flow_sample.dropped_packets, 
                 flow_sample.desc.dropped_packets
             ],
             arrow_length = 4
@@ -150,7 +150,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Input Interface',
-                flow_sample.input_interface.hex().upper(), 
+                flow_sample.input_interface, 
                 flow_sample.desc.input_interface
             ],
             arrow_length = 4
@@ -159,7 +159,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Output Interface',
-                flow_sample.output_interface.hex().upper(), 
+                flow_sample.output_interface, 
                 flow_sample.desc.output_interface
             ],
             arrow_length = 4
@@ -168,7 +168,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Format',
-                flow_sample.output_interface_format.hex().upper(), 
+                flow_sample.output_interface_format, 
                 flow_sample.desc.output_interface_format
             ],
             arrow_length = 6
@@ -177,7 +177,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Value',
-                flow_sample.output_interface_value.hex().upper(), 
+                flow_sample.output_interface_value, 
                 flow_sample.desc.output_interface_value
             ],
             arrow_length = 6
@@ -186,7 +186,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Flow Record',
-                flow_sample.flow_record.hex().upper(), 
+                flow_sample.flow_record, 
                 flow_sample.desc.flow_record
             ],
             arrow_length = 4

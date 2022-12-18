@@ -477,7 +477,7 @@ class print_Ethernet():
                 column_widths = self.widths,
                 entries = [
                     'VLAN ID', 
-                    self.Packet.vlan_id.hex().upper(),
+                    self.Packet.vlan_id,
                     self.Packet.desc.vlan_id
                 ],
                 arrow_length = 2
@@ -489,8 +489,9 @@ class print_Ethernet():
             column_widths = self.widths,
             entries = [
                 ethertype_abbreviation,
-                self.Packet.ethertype.hex().upper(), 
+                self.Packet.ethertype, 
                 self.Packet.desc.ethertype
                 ]
         )
-        
+
+

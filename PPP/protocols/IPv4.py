@@ -64,7 +64,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Version',
-                parent.Packet.IPv4.version.hex().upper(), 
+                parent.Packet.IPv4.version, 
                 parent.Packet.IPv4.desc.version
             ],
             arrow_length = 2
@@ -73,7 +73,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Header Length',
-                parent.Packet.IPv4.ihl.hex().upper(), 
+                parent.Packet.IPv4.ihl, 
                 parent.Packet.IPv4.desc.ihl
             ],
             arrow_length = 2
@@ -82,7 +82,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'DSCP',
-                parent.Packet.IPv4.dscp.hex().upper(), 
+                parent.Packet.IPv4.dscp, 
                 parent.Packet.IPv4.desc.dscp
             ],
             arrow_length = 2
@@ -91,7 +91,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'ECN',
-                parent.Packet.IPv4.ecn.hex().upper(), 
+                parent.Packet.IPv4.ecn, 
                 parent.Packet.IPv4.desc.ecn
             ],
             arrow_length = 2
@@ -100,7 +100,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Total Length',
-                parent.Packet.IPv4.total_length.hex().upper(), 
+                parent.Packet.IPv4.total_length, 
                 parent.Packet.IPv4.desc.total_length
             ],
             arrow_length = 2
@@ -109,7 +109,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Identification',
-                parent.Packet.IPv4.identification.hex().upper(), 
+                parent.Packet.IPv4.identification, 
                 parent.Packet.IPv4.desc.identification
             ],
             arrow_length = 2
@@ -118,7 +118,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Flags',
-                parent.Packet.IPv4.flags.hex().upper(), 
+                parent.Packet.IPv4.flags, 
                 parent.Packet.IPv4.desc.flags
             ],
             arrow_length = 2
@@ -127,7 +127,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Fragment Offset',
-                parent.Packet.IPv4.fragment_offset.hex().upper(), 
+                parent.Packet.IPv4.fragment_offset, 
                 parent.Packet.IPv4.desc.fragment_offset
             ],
             arrow_length = 2
@@ -136,7 +136,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Time to Live',
-                parent.Packet.IPv4.ttl.hex().upper(), 
+                parent.Packet.IPv4.ttl, 
                 parent.Packet.IPv4.desc.ttl
             ],
             arrow_length = 2
@@ -145,7 +145,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Protocol',
-                parent.Packet.IPv4.protocol.hex().upper(), 
+                parent.Packet.IPv4.protocol, 
                 parent.Packet.IPv4.desc.protocol
             ],
             arrow_length = 2
@@ -154,7 +154,7 @@ class print_IPv4(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Checksum',
-                parent.Packet.IPv4.checksum.hex().upper(), 
+                parent.Packet.IPv4.checksum, 
                 parent.Packet.IPv4.desc.checksum
             ],
             arrow_length = 2
