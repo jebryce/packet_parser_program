@@ -5,13 +5,10 @@ class flow_sample():
         Packet.update_widths(8, 32)
         sFlow = Packet.IPv4.UDP.sFlow
 
-        self.enterprise = (int.from_bytes(sFlow.samples[0:3], 'big') & 0xFFFFF0).to_bytes(3, 'big')
-
-        
-        self.sample_type = (sFlow.samples[2] & 0b1111) * 256
-        self.sample_type += sFlow.samples[3]
-        self.sample_type = self.sample_type.to_bytes(2, 'big')
-
+        self.enterprise = Packet.extract_bits(sFlow.samples[0:3], 0xFFFFF0)
+    
+        self.sample_type = Packet.extract_bits(sFlow.samples[2:4], 0x0FFF)
+    
         self.sample_length = sFlow.samples[4:8]
         self.sequence_number = sFlow.samples[8:12]
         self.source_id_class = sFlow.samples[12:13]
@@ -22,30 +19,33 @@ class flow_sample():
         self.dropped_packets = sFlow.samples[24:28]
         self.input_interface = sFlow.samples[28:32]
         
-        self.output_interface = sFlow.samples[32:36]
-        self.output_interface_format = (sFlow.samples[32] >> 6).to_bytes(1, 'big')
+        self.output_interface_format = \
+            Packet.extract_bits(sFlow.samples[32:33], 0b11000000)
+        
+        
         self.output_interface_value = (int.from_bytes(sFlow.samples[32:36], 'big') & 0x0FFFFFFF).to_bytes(4, 'big')
 
         self.flow_record = sFlow.samples[36:40]
 
+        self.raw_header = sFlow.samples[40:]
+
 class flow_sample_desc():
     def __init__(self, Packet):
-        self.enterprise = ''
+        self.enterprise = 'sFlow structure in use. 0 is standard.'
 
         
-        self.sample_type = ''
+        self.sample_type = 'Flow Sample.'
 
-        self.sample_length = ''
-        self.sequence_number = ''
+        self.sample_length = 'Length of the flow sample.'
+        self.sequence_number = 'A counter for the number of flow samples.'
         self.source_id_class = ''
         self.index = ''
         
-        self.sampling_rate = ''
-        self.sample_pool = ''
+        self.sampling_rate = 'Number of packets per 1 sample.'
+        self.sample_pool = 'Total number of packets.'
         self.dropped_packets = ''
         self.input_interface = ''
         
-        self.output_interface = ''
         self.output_interface_format = ''
         self.output_interface_value = ''
 
@@ -113,7 +113,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
         parent.pf.print_data( 
             column_widths = parent.widths,
             entries = [
-                'Index',
+                'Source ID Index',
                 flow_sample.index, 
                 flow_sample.desc.index
             ],
@@ -158,16 +158,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
         parent.pf.print_data( 
             column_widths = parent.widths,
             entries = [
-                'Output Interface',
-                flow_sample.output_interface, 
-                flow_sample.desc.output_interface
-            ],
-            arrow_length = 4
-        )
-        parent.pf.print_data( 
-            column_widths = parent.widths,
-            entries = [
-                'Format',
+                'Output Interface Format',
                 flow_sample.output_interface_format, 
                 flow_sample.desc.output_interface_format
             ],
@@ -176,7 +167,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
         parent.pf.print_data( 
             column_widths = parent.widths,
             entries = [
-                'Value',
+                'Output Interface Value',
                 flow_sample.output_interface_value, 
                 flow_sample.desc.output_interface_value
             ],

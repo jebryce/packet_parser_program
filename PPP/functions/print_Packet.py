@@ -16,7 +16,7 @@
 #               counters_sample
 
 from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP
-from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample
+from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample, raw_packet_header
 
 def Printer(Packet):
     Parent = Ethernet.print_Ethernet(Packet)
@@ -49,6 +49,8 @@ def sFlow_tree(Packet, Parent):
     sFlow = Packet.IPv4.UDP.sFlow
     if sFlow.samples[0:4].hex() == '00000001':
         flow_sample.print_flow_sample(Parent)
+        raw_packet_header.print_raw_packet_header(Parent)
+        Printer(sFlow.flow_sample.raw_packet_header.Packet)
     elif sFlow.samples[0:4].hex() == '00000002':
         counters_sample.print_counters_sample(Parent)
         

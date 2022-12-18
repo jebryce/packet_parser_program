@@ -18,7 +18,7 @@
 # my_Packet.desc.variable              | calls the description of variable
 # 
 from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP
-from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample
+from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample, raw_packet_header
 
 # create both parsed data and the descriptions
 
@@ -72,6 +72,13 @@ def sFlow_tree(Packet):
     if sFlow.samples[0:4].hex() == '00000001':
         sFlow.flow_sample = flow_sample.flow_sample(Packet)
         sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
+        
+        sFlow.flow_sample.raw_packet_header = \
+            raw_packet_header.raw_packet_header(Packet)
+        sFlow.flow_sample.raw_packet_header.desc = \
+            raw_packet_header.raw_packet_header_desc(Packet)
+        raw_header = sFlow.flow_sample.raw_packet_header
+        raw_header.Packet = Parser(raw_header.sampled_packet)
     elif sFlow.samples[0:4].hex() == '00000002':
         sFlow.counters_sample = counters_sample.counters_sample(Packet)
         sFlow.counters_sample.desc =counters_sample.counters_sample_desc(Packet)

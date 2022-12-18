@@ -43,9 +43,28 @@ class Ethernet():
         )
     
     def extract_bits(self, raw: bytes, mask: int):
+        # length is used in converting back to bytes, the int.to_bytes() 
+        # function requires the length of the bytes object
         length = len(raw)
+
+        # decimal is the integer representaion of the bytes we are trying 
+        # extract bits from
         decimal = int.from_bytes(raw, 'big')
-        extracted = decimal & mask
+
+        # count the number of zeroes in the mask.
+        # if mask = 0b11110000, zero_count = 4
+        # if mask = 0b00111111, zero_count = 0 as python auto removes leading 
+        # zeros
+        zero_count = bin(mask)[2:].count('0')
+        if zero_count > 0:
+            # we need to shift them over to preserve place values
+            # if mask = 0b1100 and decimal = 0b1000, we want to return 0b0010,
+            # instead of 0b1000
+            extracted = decimal >> zero_count
+        else:
+            # if the mask is say 0b0011, return the lowest two bits of decimal
+            extracted = decimal & mask
+
         return extracted.to_bytes(length, 'big')
 
 class Ethernet_desc():
@@ -493,5 +512,6 @@ class print_Ethernet():
                 self.Packet.desc.ethertype
                 ]
         )
+
 
 
