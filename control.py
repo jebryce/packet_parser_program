@@ -40,7 +40,7 @@ for hex_string in packets[2:]:
 
     # print the objects information to console
     print_Packet.Printer(Packet)
- 
+
     # print(john_hexdump.john_hexdump(pkt,32,8,'_'))
 
     break

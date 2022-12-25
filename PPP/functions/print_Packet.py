@@ -50,11 +50,13 @@ def UDP_tree(Packet, Parent):
 
 def sFlow_tree(Packet, Parent):
     sFlow = Packet.IPv4.UDP.sFlow
-    if sFlow.samples[0:4].hex() == '00000001':
-        flow_sample.print_flow_sample(Parent)
-        raw_packet_header.print_raw_packet_header(Parent)
-        extended_switch_data.print_extended_switch_data(Parent)
-        # Printer(sFlow.flow_sample.raw_packet_header.Packet)
-    elif sFlow.samples[0:4].hex() == '00000002':
-        counters_sample.print_counters_sample(Parent)
+    print(int.from_bytes(sFlow.number_of_samples,'big'))
+    for sample in range(int.from_bytes(sFlow.number_of_samples,'big')):
+        if sFlow.samples[0:4].hex() == '00000001':
+            flow_sample.print_flow_sample(Parent, sample)
+            raw_packet_header.print_raw_packet_header(Parent)
+            extended_switch_data.print_extended_switch_data(Parent)
+            # Printer(sFlow.flow_sample.raw_packet_header.Packet)
+        elif sFlow.samples[0:4].hex() == '00000002':
+            counters_sample.print_counters_sample(Parent, sample)
         

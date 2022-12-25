@@ -12,7 +12,7 @@ class flow_sample():
         self.sample_length = sFlow.samples[4:8]
         self.sequence_number = sFlow.samples[8:12]
         self.source_id_class = sFlow.samples[12:13]
-        self.index = sFlow.samples[13:16]
+        self.source_id_index = sFlow.samples[13:16]
         
         self.sampling_rate = sFlow.samples[16:20]
         self.sample_pool = sFlow.samples[20:24]
@@ -39,7 +39,7 @@ class flow_sample_desc():
         self.sample_length = 'Length of the flow sample.'
         self.sequence_number = 'A counter for the number of flow samples.'
         self.source_id_class = ''
-        self.index = ''
+        self.source_id_index = ''
         
         self.sampling_rate = 'Number of packets per 1 sample.'
         self.sample_pool = 'Total number of packets.'
@@ -52,16 +52,16 @@ class flow_sample_desc():
         self.flow_record = ''
         
 class print_flow_sample(Ethernet.print_Ethernet):
-    def __init__(self, parent):
+    def __init__(self, parent, sample_number):
         # so I wouldn't have to type out (or copy) this long ass message
         flow_sample = parent.Packet.IPv4.UDP.sFlow.flow_sample
 
         parent.pf.print_data( 
             column_widths = parent.widths,
             entries = [
-                'Flow Sample',
-                '1', 
-                'sFlow flow sample'
+                'Sample Number',
+                sample_number, 
+                ''
             ],
             arrow_length = 2
         )
@@ -114,8 +114,8 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Source ID Index',
-                flow_sample.index, 
-                flow_sample.desc.index
+                flow_sample.source_id_index, 
+                flow_sample.desc.source_id_index
             ],
             arrow_length = 4
         )

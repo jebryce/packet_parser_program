@@ -69,26 +69,44 @@ def UDP_tree(Packet):
 
 def sFlow_tree(Packet):
     sFlow = Packet.IPv4.UDP.sFlow
-    if sFlow.samples[0:4].hex() == '00000001':
-        sFlow.flow_sample = flow_sample.flow_sample(Packet)
-        sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
-        
-        sFlow.flow_sample.raw_packet_header = \
-            raw_packet_header.raw_packet_header(Packet)
-        sFlow.flow_sample.raw_packet_header.desc = \
-            raw_packet_header.raw_packet_header_desc(Packet)
 
-        sFlow.flow_sample.extended_switch_data = \
-            extended_switch_data.extended_switch_data(Packet)
-        sFlow.flow_sample.extended_switch_data.desc = \
-            extended_switch_data.extended_switch_data_desc(Packet)
-        
+    for sample in range(int.from_bytes(sFlow.number_of_samples,'big')):
+        if sFlow.samples[0:4].hex() == '00000001':
+            sFlow.flow_sample = flow_sample.flow_sample(Packet)
+            sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
+            
+            sFlow.flow_sample.raw_packet_header = \
+                raw_packet_header.raw_packet_header(Packet)
+            sFlow.flow_sample.raw_packet_header.desc = \
+                raw_packet_header.raw_packet_header_desc(Packet)
 
-        raw_header = sFlow.flow_sample.raw_packet_header
-        raw_header.Packet = Parser(raw_header.sampled_packet)
+            sFlow.flow_sample.extended_switch_data = \
+                extended_switch_data.extended_switch_data(Packet)
+            sFlow.flow_sample.extended_switch_data.desc = \
+                extended_switch_data.extended_switch_data_desc(Packet)
+
+            raw_header = sFlow.flow_sample.raw_packet_header
+            raw_header.Packet = Parser(raw_header.sampled_packet)
+
+            # the sample_length value seems to be 8 less than usual
+            # I am assuming sFlow does not count the 4 enterprise/format bytes 
+            # and the 4 sample_length bytes as part of the sample_length
+            index = int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8
+
+            sFlow.samples = sFlow.samples[index:]
 
 
-    elif sFlow.samples[0:4].hex() == '00000002':
-        sFlow.counters_sample = counters_sample.counters_sample(Packet)
-        sFlow.counters_sample.desc =counters_sample.counters_sample_desc(Packet)
+        elif sFlow.samples[0:4].hex() == '00000002':
+            sFlow.counters_sample = counters_sample.counters_sample(Packet)
+            sFlow.counters_sample.desc = \
+                counters_sample.counters_sample_desc(Packet)
+            
+            # the sample_length value seems to be 8 less than usual
+            # I am assuming sFlow does not count the 4 enterprise/format bytes 
+            # and the 4 sample_length bytes as part of the sample_length
+            index = \
+                int.from_bytes(sFlow.counters_sample.sample_length, 'big') + 8
+            sFlow.samples = sFlow.samples[index:]
+            
+            
         
