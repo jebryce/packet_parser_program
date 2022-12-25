@@ -70,8 +70,9 @@ def UDP_tree(Packet):
 def sFlow_tree(Packet):
     sFlow = Packet.IPv4.UDP.sFlow
 
+    index = 0
     for sample in range(int.from_bytes(sFlow.number_of_samples,'big')):
-        if sFlow.samples[0:4].hex() == '00000001':
+        if sFlow.samples[index:index + 4].hex() == '00000001':
             sFlow.flow_sample = flow_sample.flow_sample(Packet)
             sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
             
@@ -91,12 +92,10 @@ def sFlow_tree(Packet):
             # the sample_length value seems to be 8 less than usual
             # I am assuming sFlow does not count the 4 enterprise/format bytes 
             # and the 4 sample_length bytes as part of the sample_length
-            index = int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8
-
-            sFlow.samples = sFlow.samples[index:]
+            index += int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8
 
 
-        elif sFlow.samples[0:4].hex() == '00000002':
+        elif sFlow.samples[index:index + 4].hex() == '00000002':
             sFlow.counters_sample = counters_sample.counters_sample(Packet)
             sFlow.counters_sample.desc = \
                 counters_sample.counters_sample_desc(Packet)
@@ -104,9 +103,9 @@ def sFlow_tree(Packet):
             # the sample_length value seems to be 8 less than usual
             # I am assuming sFlow does not count the 4 enterprise/format bytes 
             # and the 4 sample_length bytes as part of the sample_length
-            index = \
+            index += \
                 int.from_bytes(sFlow.counters_sample.sample_length, 'big') + 8
-            sFlow.samples = sFlow.samples[index:]
+
             
             
         

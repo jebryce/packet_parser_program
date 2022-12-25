@@ -60,10 +60,11 @@ class print_flow_sample(Ethernet.print_Ethernet):
             column_widths = parent.widths,
             entries = [
                 'Sample Number',
-                sample_number, 
+                str(sample_number), 
                 ''
             ],
-            arrow_length = 2
+            arrow_length = 2,
+            line = 0b10
         )
         parent.pf.print_data( 
             column_widths = parent.widths,

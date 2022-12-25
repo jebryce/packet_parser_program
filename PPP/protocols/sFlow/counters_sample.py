@@ -27,5 +27,15 @@ class counters_sample_desc():
         self.counters_records = ''
         
 class print_counters_sample(Ethernet.print_Ethernet):
-    def __init__(self, parent):
-        pass
+    def __init__(self, parent, sample_number):
+
+        parent.pf.print_data( 
+            column_widths = parent.widths,
+            entries = [
+                'Sample Number',
+                str(sample_number), 
+                ''
+            ],
+            arrow_length = 2,
+            line = 0b10
+        )

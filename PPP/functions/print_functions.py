@@ -65,7 +65,7 @@ class print_functions():
     # '              VLAN ID | 3                 | SDN Production'
     # '                      |--> VLAN ID: 3     | SDN Production'
     # (function combines first 2 columns in event of a passed arrow length)
-    def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True):
+    def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True, line = 0b01):
         # column_widths should be a list of 2 integers, corresponding with the 
         # widths of the first two columns. The third column's width will be 
         # calculated using the bar_length variable passed when calling the class
@@ -124,21 +124,35 @@ class print_functions():
             second_column_width -= arrow_length
 
             gap_size = len(entries[0]) + len(entries[1]) + arrow_length
-            gap_size = column_widths[1] - gap_size - 2
+            gap_size = column_widths[1] - gap_size - 1
             gap_size_mult = gap_size // 2
+            match line:
+                case 0b00:
+                    # No gap
+                    gap = ' '
+                case 0b01:
+                    # alternating spacesa and periods
+                    # ex: ' . . . . . . .'
+                    if gap_size % 2 == 1:
+                        gap = ' '
+                    else:
+                        gap = '  '
+                        gap_size_mult -= 1
+                    gap += '. '*gap_size_mult
+                case 0b10:
+                    # solid underscores
+                    gap = '_' * gap_size
+                case 0b11:
+                    # solid spaces
+                    gap = ' ' * gap_size
 
-            if gap_size % 2 == 1:
-                gap = ' '
-            else:
-                gap = ''
-            gap += '. '*gap_size_mult
 
 
             # imo, instead of printing:
             # ex: '              VLAN ID |--> 03             | SDN Production'
             # it looks better to print: 
             # ex: '                      |--> VLAN ID:  . 03 | SDN Production'
-            entries[1] = entries[0]+': '+gap+entries[1]
+            entries[1] = entries[0]+':'+gap+entries[1]
             entries[0] = ''
 
 
