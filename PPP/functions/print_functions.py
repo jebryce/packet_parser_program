@@ -65,7 +65,7 @@ class print_functions():
     # '              VLAN ID | 3                 | SDN Production'
     # '                      |--> VLAN ID: 3     | SDN Production'
     # (function combines first 2 columns in event of a passed arrow length)
-    def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True, line = 0b01):
+    def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True, line_case = '.'):
         # column_widths should be a list of 2 integers, corresponding with the 
         # widths of the first two columns. The third column's width will be 
         # calculated using the bar_length variable passed when calling the class
@@ -126,11 +126,11 @@ class print_functions():
             gap_size = len(entries[0]) + len(entries[1]) + arrow_length
             gap_size = column_widths[1] - gap_size - 1
             gap_size_mult = gap_size // 2
-            match line:
-                case 0b00:
+            match line_case:
+                case None:
                     # No gap
                     gap = ' '
-                case 0b01:
+                case '.':
                     # alternating spacesa and periods
                     # ex: ' . . . . . . .'
                     if gap_size % 2 == 1:
@@ -139,10 +139,10 @@ class print_functions():
                         gap = '  '
                         gap_size_mult -= 1
                     gap += '. '*gap_size_mult
-                case 0b10:
+                case '_':
                     # solid underscores
                     gap = '_' * gap_size
-                case 0b11:
+                case ' ':
                     # solid spaces
                     gap = ' ' * gap_size
 

@@ -1,33 +1,33 @@
 from PPP.protocols import Ethernet
 
 class flow_sample():
-    def __init__(self, Packet):
+    def __init__(self, Packet, index):
         Packet.update_widths(8, 32)
-        sFlow = Packet.IPv4.UDP.sFlow
+        samples = Packet.IPv4.UDP.sFlow.samples[index:]
 
-        self.enterprise = Packet.extract_bits(sFlow.samples[0:3], 0xFFFFF0)
+        self.enterprise = Packet.extract_bits(samples[0:3], 0xFFFFF0)
     
-        self.sample_type = Packet.extract_bits(sFlow.samples[2:4], 0x0FFF)
+        self.sample_type = Packet.extract_bits(samples[2:4], 0x0FFF)
     
-        self.sample_length = sFlow.samples[4:8]
-        self.sequence_number = sFlow.samples[8:12]
-        self.source_id_class = sFlow.samples[12:13]
-        self.source_id_index = sFlow.samples[13:16]
+        self.sample_length = samples[4:8]
+        self.sequence_number = samples[8:12]
+        self.source_id_class = samples[12:13]
+        self.source_id_index = samples[13:16]
         
-        self.sampling_rate = sFlow.samples[16:20]
-        self.sample_pool = sFlow.samples[20:24]
-        self.dropped_packets = sFlow.samples[24:28]
-        self.input_interface = sFlow.samples[28:32]
+        self.sampling_rate = samples[16:20]
+        self.sample_pool = samples[20:24]
+        self.dropped_packets = samples[24:28]
+        self.input_interface = samples[28:32]
         
         self.output_interface_format = \
-            Packet.extract_bits(sFlow.samples[32:33], 0b11000000)
+            Packet.extract_bits(samples[32:33], 0b11000000)
         
         
-        self.output_interface_value = (int.from_bytes(sFlow.samples[32:36], 'big') & 0x0FFFFFFF).to_bytes(4, 'big')
+        self.output_interface_value = (int.from_bytes(samples[32:36], 'big') & 0x0FFFFFFF).to_bytes(4, 'big')
 
-        self.flow_record = sFlow.samples[36:40]
+        self.flow_record = samples[36:40]
 
-        self.raw_header = sFlow.samples[40:]
+        self.raw_header = samples[40:]
 
 class flow_sample_desc():
     def __init__(self, Packet):
@@ -64,7 +64,7 @@ class print_flow_sample(Ethernet.print_Ethernet):
                 ''
             ],
             arrow_length = 2,
-            line = 0b10
+            line_case = '_'
         )
         parent.pf.print_data( 
             column_widths = parent.widths,

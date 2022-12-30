@@ -39,7 +39,7 @@ class print_extended_switch_data(Ethernet.print_Ethernet):
                 ''
             ],
             arrow_length = 4,
-            line = 0b11
+            line_case = None
         )
         parent.pf.print_data( 
             column_widths = parent.widths,

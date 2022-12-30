@@ -12,7 +12,7 @@
 # This is used for testing only
 #
 from PPP.functions import print_Packet
-from PPP.functions import Packet_Parser
+from PPP.functions import parse_Packet
 from PPP.functions import make_library
 from PPP.functions import john_hexdump
 import os
@@ -35,14 +35,16 @@ for hex_string in packets[2:]:
     # convert the line into it's intended bytes object
     pkt = bytes.fromhex(hex_string)
 
+
     # create an object with the packet's information parsed
-    Packet = Packet_Parser.Parser(pkt)
+    Packet = parse_Packet.Parser(pkt)
+
 
     # print the objects information to console
     print_Packet.Printer(Packet)
 
-    # print(john_hexdump.john_hexdump(pkt,32,8,'_'))
 
+    # print(john_hexdump.john_hexdump(pkt,32,8,'_'))
     break
     
 #     input('Press enter to continue.')

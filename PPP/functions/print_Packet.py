@@ -57,7 +57,8 @@ def sFlow_tree(Packet, Parent):
             raw_packet_header.print_raw_packet_header(Parent)
             extended_switch_data.print_extended_switch_data(Parent)
             # Printer(sFlow.flow_sample.raw_packet_header.Packet)
-            index += int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8
+            index += \
+                int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8
 
         elif sFlow.samples[index:index + 4].hex() == '00000002':
             counters_sample.print_counters_sample(Parent, sample)

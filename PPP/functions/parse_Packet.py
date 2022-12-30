@@ -73,7 +73,7 @@ def sFlow_tree(Packet):
     index = 0
     for sample in range(int.from_bytes(sFlow.number_of_samples,'big')):
         if sFlow.samples[index:index + 4].hex() == '00000001':
-            sFlow.flow_sample = flow_sample.flow_sample(Packet)
+            sFlow.flow_sample = flow_sample.flow_sample(Packet,index)
             sFlow.flow_sample.desc = flow_sample.flow_sample_desc(Packet)
             
             sFlow.flow_sample.raw_packet_header = \
@@ -96,7 +96,7 @@ def sFlow_tree(Packet):
 
 
         elif sFlow.samples[index:index + 4].hex() == '00000002':
-            sFlow.counters_sample = counters_sample.counters_sample(Packet)
+            sFlow.counters_sample = counters_sample.counters_sample(Packet, index)
             sFlow.counters_sample.desc = \
                 counters_sample.counters_sample_desc(Packet)
             
