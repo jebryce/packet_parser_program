@@ -4,19 +4,39 @@
 # 
 #
 # A way to call the class's variables, for example:
-# my_Packet = Packet(bytes), where bytes is a packet of type bytes
-# my_Packet.ethertype                  | returns a bytes object
+# Packet = Ethernet.Ethernet(bytes), where bytes is a packet of type bytes
+# Packet.ethertype                     | returns a bytes object
 #                                      | ex: 0806 (type: bytes)
-# my_Packet.desc.ethertype             | returns a string that describes
+# Packet.desc.ethertype                | returns a string that describes
 #                                      | ex: 'Address Resolution Protocol (ARP)'
-# my_Packet.ARP.opcode                 | returns a bytes object
+# Packet.ARP.opcode                    | returns a bytes object
 #                                      | ex: 01 (type: bytes)
-# my_Packet.ARP.desc.opcode            | returns a string that describes
+# Packet.ARP.desc.opcode               | returns a string that describes
 #                                      | ex: 'Request' (type: string)
 # generally:                           |
-# my_Packet.variable                   | calls the data of variable
-# my_Packet.desc.variable              | calls the description of variable
+# Packet.variable                      | calls the data of variable
+# Packet.desc.variable                 | calls the description of variable
 # 
+#
+# Given a packet we want to parse the data, and for organization, I put the 
+# entire tree that takes in a raw bytes packet, and creates the custom class 
+# 'Packet' that contains the entire parsed data, sorted in a defined way
+#
+# want to use this to contain a 'convenience' function that parses each set of 
+# info - I really should have the entire tree in here
+#
+# tree:
+# Ethernet
+#   ARP
+#   IPv4
+#       ICMP
+#       UDP
+#           sFlow
+#               flow_sample
+#                   raw_packet_header
+#                       (recurses back to start of tree)
+#                   extended_switch_data
+#               counters_sample
 from PPP.protocols import Ethernet, ARP, IPv4, ICMP, UDP
 from PPP.protocols.sFlow import sFlow, flow_sample, counters_sample, raw_packet_header, extended_switch_data
 

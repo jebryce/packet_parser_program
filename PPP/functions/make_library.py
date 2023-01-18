@@ -1,9 +1,7 @@
-# for testing
-# want to initialize ~/Library/PPP
-# want to initialize logger
-# want to initialize description lookups
-# want to initialize config file
-
+# this is a convenience function that may or may not be replaced
+#
+# it creates a folder at PATH, then populates that folder with calls to 
+# math_lookups.py and make_config.py
 
 import os
 from PPP.functions import path, make_lookups, make_config

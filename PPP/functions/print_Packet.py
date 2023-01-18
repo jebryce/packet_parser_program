@@ -1,10 +1,10 @@
 # Given a packet we want first parse the packet, but since the parsed 
 # information will be used later, we want a seperate function to print that 
 # information. 
-
+#
 # want to use this to contain a 'convenience' function that prints each set of 
 # info - I really should have the entire tree in here
-
+#
 # tree:
 # Ethernet
 #   ARP
@@ -56,6 +56,7 @@ def sFlow_tree(Packet, Parent):
             flow_sample.print_flow_sample(Parent, sample)
             raw_packet_header.print_raw_packet_header(Parent)
             extended_switch_data.print_extended_switch_data(Parent)
+            # recurses back to the start of the tree
             # Printer(sFlow.flow_sample.raw_packet_header.Packet)
             index += \
                 int.from_bytes(sFlow.flow_sample.sample_length, 'big') + 8

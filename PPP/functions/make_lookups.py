@@ -1,19 +1,49 @@
-# This is to automake making description lookup files, see individual functions 
-# for more info
+# I wanted a way to provide descriptions to some parsed data - like for mac 
+# addresses, which company has reserved the address block an individual address 
+# belongs to
+#
+# So I needed to get the data from IEEE, then be able to use it at a later time
+# I decided to request the raw csv files, (csv is comma seperated values - 
+# think excel spreadsheet) then store that information in a textfile which can 
+# then be opened and parsed to retrieve any description needed
+# 
+# the function make_lookups is a convenience function that calls each 
+# individual lookup function that requests and stores description information
+#
+# the function request_to_file is the general function that requests a csv file 
+# from a url, parses the information from the csv file, then stores the wanted 
+# information into a textfile
+#
+# for each lookup file, I created a function that logs some information, then 
+# feeds a url into the request_to_file function. There also needs to be a data 
+# remover function passed, which takes a row from the csv file then removes 
+# columns with unneeded information
+#
+# please see each individual function for more information
 # 
 # found ethertypes, mac addresses from:
 # https://standards.ieee.org/products-programs/regauth/
-# 
-# 
+#
+# found arp opcode and hardware types from:
+# https://www.iana.org/assignments/arp-parameters/
+#
 
 import requests
 import csv
 from PPP.functions import log, path
 
+def make_lookups(path):
+    # may or may not be replaced
+    global PATH
+    PATH = path
+    make_mac_lookup()
+    make_ethertype_lookup()
+    make_arp_opcode_lookup()
+    make_arp_hardware_lookup()
 
 def request_to_file(write_path, data_remover_function, *urls):
-    # takes in any amount of urls (to csv files (excel, spreadsheet data 
-    # format), creates a file at write_path, then passes each row of the csv
+    # takes in any amount of urls (to csv files (think excel spreadsheet)
+    # creates a file at write_path, then passes each row of the csv
     # file through data_remover_function
     #
     # example write_path: (type: string)
@@ -26,11 +56,11 @@ def request_to_file(write_path, data_remover_function, *urls):
     # 'http://standards-oui.ieee.org/oui/oui.csv'
 
 
-    # 'with' statement closes session after we are finished with it
+    # 'with' statements close sessions after we are finished
     with requests.Session() as request_session:
         with open(write_path, 'w', encoding='utf-8') as lookup_file:
 
-            # write a breadcrumb? back to here if anyone is curious
+            # write a breadcrumb back to here if anyone is curious
             lookup_file.write(
                 '# Created using PPP/functions/make_lookups.py\n'
             )
@@ -89,12 +119,14 @@ def request_to_file(write_path, data_remover_function, *urls):
                     
                     # this is how I checked if I received a full row or a 
                     # partial one 
-                    #
+                    # 
                     # basically if there was a newline in a cell, then the csv 
                     # format would save the contents of that cell surrounded 
                     # with double quotes, so if the .iter_lines() provides a 
                     # string with an odd number of " characters, then it must 
-                    # be a partial row 
+                    # be a partial row
+                    # (" characters themselves are saved as "" in the csv 
+                    # format)
                     # 
                     # (aka the number of " characters mod 2 = 1)
                     if raw_row.count('"') % 2 == 1:
@@ -150,6 +182,7 @@ def request_to_file(write_path, data_remover_function, *urls):
     # memory = new/old * 100%, new method takes 13.46% the memory
     # time = old/new * 100%,       old method took 91.1% the time
     # time = (new/old - 1) * 100%, new method takes 9.72% longer
+    pass
 
     
 def make_mac_lookup():
@@ -193,7 +226,7 @@ def data_remover_mac(list_row):
 def make_ethertype_lookup():
     # (re)generates a file that contains ethertypes and their descriptions
 
-    # Where the mac address lookup table will be located
+    # Where the ethertype lookup table will be located
     write_path = PATH + 'ethertype_lookup.txt'
 
     # see PPP/functions/log.py
@@ -259,7 +292,7 @@ def data_remover_arp_opcode(list_row):
     if '-' in list_row[0]:
         # if csv has a range of values, don't bother writing it to file
         # ex: ['26-65534', 'Unassigned']
-        # retursn false to not print to file
+        # returns false to not print to file
         return False
     # remove the third entry
     list_row.pop(2)
@@ -294,7 +327,7 @@ def data_remover_arp_hardware(list_row):
     if '-' in list_row[0]:
         # if csv has a range of values, don't bother writing it to file
         # ex: ['258-65534', 'Unassigned']
-        # retursn false to not print to file
+        # returns false to not print to file
         return False
     # remove the third entry
     list_row.pop(2)
@@ -306,11 +339,4 @@ def data_remover_arp_hardware(list_row):
     # returns true to print to file
     return True
 
-def make_lookups(path):
-    # this is for testing, will be removed when implemented fully.
-    global PATH
-    PATH = path
-    make_mac_lookup()
-    make_ethertype_lookup()
-    make_arp_opcode_lookup()
-    make_arp_hardware_lookup()
+

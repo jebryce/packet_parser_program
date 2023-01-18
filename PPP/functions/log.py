@@ -16,4 +16,5 @@ def log(string, filename = 'log.txt', path_to = path.PATH):
         # 11/15/22 20:22:35 | Created: Documents/PPP/mac_lookup.txt
         log_file.write(time + string + '\n')
 
+    # haven't decided if I want to keep this print statement or not
     print(time + string)

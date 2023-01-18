@@ -1,4 +1,9 @@
-# this is used to wrap long strings when printing. 
+# When printing some descriptions that were requested from external csv files,
+# some descriptions wouldn't fit in the space provided, and would make the 
+# printed information very ugly
+# 
+# this is used to break long strings into shorter strings with a specified max 
+# length
 #
 # Ideally it breaks the string into 2 (or more) strings at a space, if not, 
 # then it hypenates
@@ -13,10 +18,9 @@ def wrap_line(return_list, string, cutoff):
     string = string.strip()
 
 
-    # find the index of the first space character
     if len(string) <= cutoff:
         # this is a recursive program, so once it has finished breaking the 
-        # string up, this is how it finishes
+        # string up, this if statement is how it finishes
         return_list.append(string)
     else:
         # so if cutoff = 9 (realistically the cutoff should be much higher)

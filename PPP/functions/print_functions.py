@@ -1,5 +1,7 @@
-# moved into new file in case we want to print something else with the same 
-# formatting. Saved as a class for ease of importing. 
+# I wanted a standardized way to print data but I also wanted any scripts built 
+# on top of this library to be able to use the same formatting, thus I 
+# created this class with some prebuilt methods that can be used to print data 
+# to console in a table format, with any functionality I thought could be useful
 # 
 # example usage:
 # from functions import print_functions
@@ -49,21 +51,21 @@ class print_functions():
         # calculated using the bar_length variable passed when calling the class
         # ex = [10,20]
         #
-        # cutoff is how many characters wide the third column is
+        # third_column_width is how many characters wide the third column is
         # the int 7 represents the spaces and '|' characters used in the 
         # print_data() function - it is one less character for presentation
-        cutoff = self.bar_length - 7 - sum(column_widths)
+        third_column_width = self.bar_length - 7 - sum(column_widths)
 
         # the extra '-' characters (why it is '--+-' instead of '+') are to 
         # account for the forced white space in the print_data() function
         data_bar = column_widths[0]*'-' + '--+-' + \
-            column_widths[1]*'-' + '-+-' + cutoff*'-'
+            column_widths[1]*'-' + '-+-' + third_column_width*'-'
         self.optional_print(data_bar)
             
 
 
     # '              VLAN ID | 3                 | SDN Production'
-    # '                      |--> VLAN ID: 3     | SDN Production'
+    # '                      |--> VLAN ID: . . 3 | SDN Production'
     # (function combines first 2 columns in event of a passed arrow length)
     def print_data(self, column_widths, entries, arrow_length = 0, just = '<', lead_zero_strip = True, line_case = '.'):
         # column_widths should be a list of 2 integers, corresponding with the 
@@ -81,30 +83,44 @@ class print_functions():
         # ex if arrow_length = 0
         # '              VLAN ID | 3                 | SDN Production'
         # ex if arrow_length = 3
-        # '                      |--> VLAN ID: 3     | SDN Production'
+        # '                      |--> VLAN ID: . . 3 | SDN Production'
         #
         # just is the justification of the second column
         # ex if just = '<' then: 
         # '        Type | MAC Address       | Vendor ID ' 
         # ex if just = '^' then:
         # '        Type |    MAC Address    | Vendor ID '
+        #
+        # lead_zero_strip, if true, strips the lead zeroes of the second item 
+        # of the list entries (entries[1])
+        # ex: if entries[1] = 008243, then it will print 8243
+        # 
+        # line_case is used to create an "eye guide"
+        # see the 'match' statement below for more info
 
+        
         if type(entries[1]) == bytes:
-            entries[1] = entries[1].hex().upper().lstrip('0')
+            # convert the bytes to a ascii representation, then make all 
+            # letters uppercase
+            entries[1] = entries[1].hex().upper()
+
+            if lead_zero_strip == True:
+                # strip the leading zeros
+                entries[1] = entries[1].lstrip('0')
+            
             if entries[1] == '':
                 entries[1] = '0'
 
 
         # at the ends of this function, it calls a custom print function and 
         # passes this string formatted. 
-        # (on the internet, lookup python string format() method for more info)
         data_format = ' {first_entry:>{first_column_width}} |{arrow}' + \
             ' {second_entry:{just}{second_column_width}} | {third_entry} '
 
-        # cutoff is how many characters wide the third column is
+        # third_column_width is how many characters wide the third column is
         # the int 8 represents the spaces and '|' characters used in the 
         # data_format string
-        cutoff = self.bar_length - 8 - sum(column_widths)
+        third_column_width = self.bar_length - 8 - sum(column_widths)
 
         second_column_width = column_widths[1]
 
@@ -123,9 +139,19 @@ class print_functions():
             # total width with or without the arrow
             second_column_width -= arrow_length
 
-            gap_size = len(entries[0]) + len(entries[1]) + arrow_length
-            gap_size = column_widths[1] - gap_size - 1
-            gap_size_mult = gap_size // 2
+            # this is kinda confusing,
+            # I wanted to combine the first two columns in the event that an 
+            # arrow length is passed as imo, instead of printing:
+            # '              VLAN ID |--> 03              | SDN Production'
+            # it looks better to print: 
+            # '                      |--> VLAN ID:_____03 | SDN Production'
+            #
+            # so... first we calculate the size of the gap (represented by the 
+            # underscores in the VLAN ID comment example three lines up)
+
+            gap_size = second_column_width - len(entries[0] + entries[1]) - 1
+            
+            # then create the string of width gap_size to be inserted
             match line_case:
                 case None:
                     # No gap
@@ -133,6 +159,7 @@ class print_functions():
                 case '.':
                     # alternating spacesa and periods
                     # ex: ' . . . . . . .'
+                    gap_size_mult = gap_size // 2
                     if gap_size % 2 == 1:
                         gap = ' '
                     else:
@@ -146,27 +173,24 @@ class print_functions():
                     # solid spaces
                     gap = ' ' * gap_size
 
-
-
-            # imo, instead of printing:
-            # ex: '              VLAN ID |--> 03             | SDN Production'
-            # it looks better to print: 
-            # ex: '                      |--> VLAN ID:  . 03 | SDN Production'
+            # and combine the two columns
             entries[1] = entries[0]+':'+gap+entries[1]
             entries[0] = ''
 
-
-
-
-        
-
-        
+        # When printing some descriptions that were requested from external csv 
+        # files, some descriptions wouldn't fit in the space provided, and 
+        # would make the printed information very ugly
+        # 
+        # so I created wrap_line.py, which will split a string into a list of 
+        # strings of a max provided length, but this is the logic that calls
+        # that external function
+        #
         # if the data of the third column fits in the width provided, then 
         # print on one line
         #
         # ex:
         # '              VLAN ID | 3                 | SDN Production'
-        if len(entries[2]) < cutoff:
+        if len(entries[2]) < third_column_width:
             self.optional_print(data_format.format(
                 first_entry = entries[0],
                 first_column_width = column_widths[0], 
@@ -183,7 +207,7 @@ class print_functions():
         else:  
             # wrap_line() populates this list that is passed
             print_list = list()
-            wrap_line.wrap_line(print_list,entries[2],cutoff)
+            wrap_line.wrap_line(print_list,entries[2],third_column_width)
 
             # first, print the data that was passed to the start of this 
             # print_data() function and the first string returned from the 
@@ -207,6 +231,7 @@ class print_functions():
             #
             # ex
             # '                |                   | wrapped around text!'
+            # '                |                   | another line wrapped !!!'
             for string in print_list[1:]:
                 self.optional_print(data_format.format(
                     first_entry = '',

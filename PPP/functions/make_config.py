@@ -1,14 +1,20 @@
-# creates a template of a file in the path specified
+# I wanted a way to keep this library generic - i.e. not have any unique 
+# details to my implementation in the github repo - so for things like VLAN 
+# names, I still wanted to be able to print our custom names, but not have 
+# anyone who decides to use this repo to be stuck with ours
+#
+# This creates a text file so that a user can replace the generic vlan names
+
 from PPP.functions import log
 
 def make_config(path):
-    # creates a template of a file in the path specified
+
     write_path = path + 'config.txt'
 
     # see PPP/functions/log.py
     log.log('Creating: ' + write_path)
     
-    # opens the file, writes the template.
+    # write a template so that users know what to edit
     # the 'with' statment opens the files then closes it once we are done
     with open(write_path, 'w', encoding='utf-8') as config:
         config.write('# Created using PPP/functions/make_config.py\n')
